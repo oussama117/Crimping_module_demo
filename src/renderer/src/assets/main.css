@@ -1,11 +1,11 @@
 @import 'tailwindcss';
-@import "tw-animate-css";
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
 /* You can add a simple reset here if you want */
 body {
-  @apply bg-slate-900 text-white m-0 p-0 overflow-hidden;
+  @apply m-0 p-0 overflow-hidden;
 }
 
 @theme inline {
@@ -123,6 +123,6 @@ body {
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground size-full;
   }
 }

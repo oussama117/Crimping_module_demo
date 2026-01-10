@@ -1,0 +1,12 @@
+{
+  "registration_page": {
+    "title": "DIDACTIQUE",
+    "number": "MATRICULE CANDIDAT",
+    "name": "NOM DU CANDIDAT",
+    "start_button": "COMMENCER",
+    "settings_button": "PARAMÈTRES",
+    "number_error": "Le matricule doit contenir 5 chiffres",
+    "name_error": "Le nom ne peut pas être vide",
+    "score_button": "TABLEAU DE SCORE"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "registration_page": {
+    "title": "الوحدة التعليمية",
+    "number": "رقم التسجيل",
+    "name": "اسم المترشح",
+    "start_button": "ابدأ",
+    "settings_button": "الإعدادات",
+    "number_error": "يجب أن يتكون رقم التسجيل من 5 أرقام",
+    "name_error": "الاسم لا يمكن أن يكون فارغاً",
+    "score_button": "لوحة النتائج"
+  }
+}

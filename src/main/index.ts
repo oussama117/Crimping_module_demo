@@ -2,6 +2,10 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import AppDatabase from '../database/AppDatabase'
+import databaseHandler from '../database/ipcHandler'
+
+let db: any
 
 function createWindow(): void {
   // Create the browser window.
@@ -10,6 +14,7 @@ function createWindow(): void {
     height: 670,
     show: false,
     autoHideMenuBar: true,
+    // alwaysOnTop: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
@@ -39,6 +44,10 @@ function createWindow(): void {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
+  db = new AppDatabase()
+  databaseHandler(db)
+  //setup database:
+
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
 
@@ -66,6 +75,7 @@ app.whenReady().then(() => {
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
+    db.closeDB()
     app.quit()
   }
 })

@@ -1,0 +1,12 @@
+{
+  "registration_page": {
+    "title": "DIDACTIC",
+    "number": "REGISTRATION NUMBER",
+    "name": "CANDIDATE'S NAME",
+    "start_button": "START",
+    "settings_button": "SETTINGS",
+    "number_error": "5 digits number required",
+    "name_error": "name can not be empty",
+    "score_button": "SCORE BOARD"
+  }
+}
