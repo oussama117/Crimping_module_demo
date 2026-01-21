@@ -8,5 +8,20 @@
     "number_error": "يجب أن يتكون رقم التسجيل من 5 أرقام",
     "name_error": "الاسم لا يمكن أن يكون فارغاً",
     "score_button": "لوحة النتائج"
+  },
+  "trail_page": {
+    "title": "الوحدة التعليمية",
+    "return_button": "عودة",
+    "reset_button": "إعادة ضبط",
+    "settings_button": "الإعدادات",
+    "start_point": "البداية",
+    "level_1": "المستوى-1",
+    "level_2": "المستوى-2",
+    "level_3": "المستوى-3",
+    "time": "الوقت",
+    "second": "ث",
+    "start_button": "بدء",
+    "pause_button": "إيقاف مؤقت",
+    "countdown": "يبدأ خلال..."
   }
 }

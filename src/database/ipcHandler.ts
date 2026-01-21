@@ -1,8 +1,24 @@
 import { ipcMain } from 'electron'
 import AppDatabase from './AppDatabase'
+import { AppSettings, Languages } from '@/types'
 
 export default function databaseHandler(db: AppDatabase) {
-  ipcMain.handle('trail::add', (event, employee_name: string, registration_number: number) => {
-    return db.addNewTrail(employee_name, registration_number)
+  ipcMain.handle('candidate::create/get', (e, candidate_name: string, serial_number: number) => {
+    return db.createOrGetCandidate(candidate_name, serial_number)
+  })
+  ipcMain.handle('trail/candidate::getAll', (e) => {
+    return db.getAllTrailJoinCandidate()
+  })
+  ipcMain.handle('trail::getByCandidateId', (e, candidateId: number) => {
+    return db.getTrailByCandidateId(candidateId)
+  })
+  ipcMain.handle('settings::getSetting', (e) => {
+    return db.getSettings()
+  })
+  ipcMain.handle('settings::updateSetting', (e, settings: AppSettings) => {
+    return db.updateSettings(settings)
+  })
+  ipcMain.handle('settings::updateLaguage', (e, language: Languages) => {
+    return db.updateLanguage(language)
   })
 }

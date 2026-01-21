@@ -8,5 +8,20 @@
     "number_error": "Le matricule doit contenir 5 chiffres",
     "name_error": "Le nom ne peut pas être vide",
     "score_button": "TABLEAU DE SCORE"
+  },
+  "trail_page": {
+    "title": "DIDACTIQUE",
+    "return_button": "Retour",
+    "reset_button": "Réinitialiser",
+    "settings_button": "Paramètres",
+    "start_point": "Départ",
+    "level_1": "Niveau-1",
+    "level_2": "Niveau-2",
+    "level_3": "Niveau-3",
+    "time": "Temps",
+    "second": "s",
+    "start_button": "Démarrer",
+    "pause_button": "Pause",
+    "countdown": "Commencement dans..."
   }
 }

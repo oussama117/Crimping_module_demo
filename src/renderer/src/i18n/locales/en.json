@@ -8,5 +8,20 @@
     "number_error": "5 digits number required",
     "name_error": "name can not be empty",
     "score_button": "SCORE BOARD"
+  },
+  "trail_page": {
+    "title": "DIDACTIC",
+    "return_button": "Return",
+    "reset_button": "Reset",
+    "settings_button": "Settings",
+    "start_point": "Start",
+    "level_1": "Level-1",
+    "level_2": "Level-2",
+    "level_3": "Level-3",
+    "time": "Time",
+    "second": "s",
+    "start_button": "Start",
+    "pause_button": "Pause",
+    "countdown": "Commencing in..."
   }
 }

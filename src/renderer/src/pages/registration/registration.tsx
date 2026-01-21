@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '../../components/ui/button'
 import { Asterisk, ChartColumnIcon, Cog, Play, User } from 'lucide-react'
 import { Label } from '../../components/ui/label'
@@ -14,6 +14,11 @@ import i18n from '@renderer/i18n/config'
 import yazaki_logo from '../../assets/logo.png'
 import bg from '../../assets/yazaki_bg_gray.jpg'
 import { useNavigate } from 'react-router-dom'
+import { useAppSettingsStore } from '@renderer/store/useAppSettingStore'
+import { Languages } from '@/types'
+import apis from '../api/api'
+import { useCandidateStore } from '@renderer/store/useCandidateStore'
+import { useTrailStore } from '@renderer/store/useTrailStore'
 
 export default function RegistrationPage(): React.JSX.Element {
   const { t } = useTranslation()
@@ -22,6 +27,20 @@ export default function RegistrationPage(): React.JSX.Element {
   const [validReg, setValid] = useState('empty')
   const [validName, setValidName] = useState('empty')
   const navigate = useNavigate()
+  const { settings, setAppSettings, loadAppSettings } = useAppSettingsStore()
+  const { setCandidate } = useCandidateStore()
+  const { setTrail } = useTrailStore()
+
+  useEffect(() => {
+    loadAppSettings()
+  }, [loadAppSettings]) // Include loadAppSettings to satisfy dependency rules
+
+  useEffect(() => {
+    // Check if language exists to avoid issues on first load
+    if (settings.language) {
+      i18n.changeLanguage(settings.language)
+    }
+  }, [settings.language])
 
   const handleRegChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
@@ -120,9 +139,19 @@ export default function RegistrationPage(): React.JSX.Element {
                     setValid('invalid')
                     return
                   }
-                  ;(window as any).api.addTrail(name, parseInt(reg_number))
-
-                  navigate('/settings')
+                  apis
+                    .getCandidate(name, parseInt(reg_number))
+                    .then((candidate) => {
+                      setCandidate({ ...candidate })
+                      if (candidate.id != null) {
+                        apis.getTrailByCandidateId(candidate.id).then((trail) => {
+                          setTrail({ ...trail })
+                        })
+                      }
+                    })
+                    .finally(() => {
+                      navigate('/trail')
+                    })
                 }}
               >
                 <Play className="h-[50px] w-[50px] min-w-[25px] min-h-[25px]" />
@@ -139,7 +168,9 @@ export default function RegistrationPage(): React.JSX.Element {
               </Button>
               <Button
                 className="flex-1 h-[90px] border bg-[#D6D6D6] hover:bg-[#E5E5E5] cursor-pointer rounded-none flex flex-col items-center justify-center gap-2 text-xl text-black"
-                onClick={() => {}}
+                onClick={() => {
+                  navigate('/scoreboard')
+                }}
               >
                 <ChartColumnIcon className="h-[50px] w-[50px] min-w-[25px] min-h-[25px]" />
                 <Label> {t('registration_page.score_button')} </Label>
@@ -150,9 +181,24 @@ export default function RegistrationPage(): React.JSX.Element {
         <div className="absolute top-4 right-4 text-black">
           <Select
             onValueChange={(value) => {
-              i18n.changeLanguage(value)
+              setAppSettings({
+                ...settings,
+                language:
+                  value === Languages.fr
+                    ? Languages.fr
+                    : value === Languages.en
+                      ? Languages.en
+                      : Languages.ar
+              })
+              apis.updateLangauge(
+                value === Languages.fr
+                  ? Languages.fr
+                  : value === Languages.en
+                    ? Languages.en
+                    : Languages.ar
+              )
             }}
-            defaultValue={i18n.language}
+            value={settings.language || Languages.fr}
           >
             <SelectTrigger className="w-[120px]">
               <SelectValue placeholder="Language" />

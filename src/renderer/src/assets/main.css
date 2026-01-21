@@ -126,3 +126,11 @@ body {
     @apply bg-background text-foreground size-full;
   }
 }
+
+.gradiant_left {
+  background: linear-gradient(90deg, white 0%, transparent 70%);
+}
+
+.gradiant_right {
+  background: linear-gradient(90deg, transparent 0%, white 70%);
+}

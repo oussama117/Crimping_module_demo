@@ -4,7 +4,13 @@
 ,"compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/renderer/src/*"]
-    }
-  }
+      "@/*": ["src/*"],
+      "@types/*": ["src/types/*"]
+    },
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true
+  },
+  "include": [
+    "src/**/*" 
+  ]
 }
