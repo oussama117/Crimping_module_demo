@@ -1,3 +1,4 @@
+import { TrailRow } from '@/types'
 import { ElectronAPI } from '@electron-toolkit/preload'
 
 export interface ICustomAPI {
@@ -7,6 +8,7 @@ export interface ICustomAPI {
   updateSettings: (settings: AppSettings) => Promise<void>
   updateLanguage: (language: Languages) => Promise<void>
   getTrailByCandidateId: (candidateId: number) => Promise<TrailRow>
+  updateTrail: (trail: TrailRow) => Promise<TrailRow>
 }
 
 export interface ICustomHardware {

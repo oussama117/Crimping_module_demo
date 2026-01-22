@@ -5,12 +5,22 @@ import { useNavigate } from 'react-router-dom'
 import yazakiLogo from '../../assets/logo.png'
 import { useEffect, useState } from 'react'
 import { useCandidateStore } from '@renderer/store/useCandidateStore'
-import { CandidateRow, Languages } from '@/types'
+import { CandidateRow, Classifications, Languages, Levels, Results, TrailRow } from '@/types'
 import { useTrailStore } from '@renderer/store/useTrailStore'
 import { useAppSettingsStore } from '@renderer/store/useAppSettingStore'
 import { useTranslation } from 'react-i18next'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle
+} from '@renderer/components/ui/dialog'
+import apis from '../api/api'
 
 export default function Trail(): React.JSX.Element {
+  // DECLARATIONS
+
   const { t } = useTranslation()
   const navigate = useNavigate()
   const [level_1, setLevel_1] = useState(false)
@@ -25,40 +35,80 @@ export default function Trail(): React.JSX.Element {
   const { trail, setTrail } = useTrailStore()
   const { settings } = useAppSettingsStore()
   const numbers = Array.from({ length: settings.level_3 ? settings.level_3 + 1 : 111 }, (_, i) => i)
-  const handleScroll = () => {
-    // Increment index, but loop back to 0 if we hit the end
-    setCurrentIndex((prev) => (prev + 1) % numbers.length)
-    if (settings.level_1 != null) {
-      if (currentIndex >= settings.level_1) {
-        setLevel_1(true)
-      } else {
-        setLevel_1(false)
-      }
-    }
-    if (settings.level_2 != null) {
-      if (currentIndex >= settings.level_2) {
-        setLevel_2(true)
-      } else {
-        setLevel_2(false)
-      }
-    }
-    if (settings.level_3 != null) {
-      if (currentIndex >= settings.level_3 - 1) {
-        setLevel_3(true)
-      } else {
-        setLevel_3(false)
-      }
-    }
-  }
-  useEffect(() => {
-    console.log('candidate from trail: ', candidate)
-    console.log('trail from trail: ', trail)
-  }, [])
 
   const [countdown, setCountdown] = useState(5)
   const [seconds, setSeconds] = useState(settings.trail_time ? settings.trail_time : 60)
   const [isCountdownActive, setisCountdownActive] = useState(false)
   const [isActive, setIsActive] = useState(false)
+  const [openDialog, setOpenDialog] = useState(false)
+  const [trailResults, setTrailResults] = useState<Partial<TrailRow>>()
+  const [arduinoData, setArduinoData] = useState<any>()
+
+  const strokeWidth = 20 // Adjust thickness here
+  const radius = 190 - strokeWidth
+  const circumference = 2 * Math.PI * radius
+  const progress = seconds / 60
+  const dashOffset = circumference - progress * circumference
+  const svgCentre = (itemWidth * 3) / 2
+
+  // HANDLERS =========================================
+
+  const getStrokeColor = () => {
+    if (seconds <= 5) return '#ef4444' // red-500
+    if (seconds <= 15) return '#f97316' // orange-500
+    return '#22c55e' // green-500
+  }
+
+  const handleSend = async (status: string) => {
+    const success = await window.hardware.sendCommand(status)
+    if (!success) {
+      alert('Failed to send: Arduino might be disconnected!')
+    }
+  }
+
+  const handleScroll = () => {
+    setCurrentIndex((prev) => (prev + 1) % numbers.length)
+  }
+
+  const handelReset = () => {
+    handleSend('0000')
+    setCurrentIndex(0)
+    setLevel_1(false)
+    setLevel_2(false)
+    setLevel_3(false)
+    setCountdown(5)
+    setIsActive(false)
+    setisCountdownActive(false)
+    if (settings.trail_time) {
+      setSeconds(settings.trail_time)
+    }
+  }
+
+  const handleOpenDialog = () => {
+    openDialog ? setOpenDialog(false) : setOpenDialog(true)
+  }
+
+  // USEEFFECTS ==================================================
+
+  useEffect(() => {
+    const l1 = settings.level_1 != null && currentIndex >= settings.level_1
+    const l2 = settings.level_2 != null && currentIndex >= settings.level_2
+    const l3 = settings.level_3 != null && currentIndex >= settings.level_3
+
+    setLevel_1(l1)
+    setLevel_2(l2)
+    setLevel_3(l3)
+
+    if (l3) handleSend('1111')
+    else if (l2) handleSend('1110')
+    else if (l1) handleSend('1100')
+    else handleSend('1000')
+  }, [currentIndex, settings])
+
+  useEffect(() => {
+    console.log('candidate from trail: ', candidate)
+    console.log('trail from trail: ', trail)
+  }, [trail])
 
   useEffect(() => {
     let interval: NodeJS.Timeout
@@ -83,12 +133,11 @@ export default function Trail(): React.JSX.Element {
   useEffect(() => {
     let interval: NodeJS.Timeout
 
-    // We only start the interval if active and we have a valid time
     if (isActive && seconds > 0) {
       interval = setInterval(() => {
         setSeconds((prev) => {
           if (prev <= 1) {
-            clearInterval(interval) // Stop exactly at 0
+            clearInterval(interval)
             return 0
           }
           return prev - 1
@@ -96,64 +145,139 @@ export default function Trail(): React.JSX.Element {
       }, 1000)
     }
 
-    // This single cleanup handles pausing, unmounting, and resets
     return () => {
       if (interval) clearInterval(interval)
     }
-
-    // Notice: 'seconds' is NOT here anymore.
-    // The effect only re-runs if the user pauses/starts or settings change.
   }, [isActive, settings.trail_time])
-  const strokeWidth = 20 // Adjust thickness here
-  const radius = 190 - strokeWidth
-  const circumference = 2 * Math.PI * radius
-  const progress = seconds / 60
-  const dashOffset = circumference - progress * circumference
-  const svgCentre = (itemWidth * 3) / 2
-
-  // 2. Dynamic Color Logic
-  const getStrokeColor = () => {
-    if (seconds <= 5) return '#ef4444' // red-500
-    if (seconds <= 15) return '#f97316' // orange-500
-    return '#22c55e' // green-500
-  }
-
-  const [arduinoData, setArduinoData] = useState<any>()
 
   useEffect(() => {
-    // Start listening for the "HI" logs
+    if (seconds !== 0) return
+
+    let trailLevel = Levels.level_init
+    if (level_3) trailLevel = Levels.level_3
+    else if (level_2) trailLevel = Levels.level_2
+    else if (level_1) trailLevel = Levels.level_1
+
+    const classMap = {
+      [Levels.level_1]: Classifications.beginner,
+      [Levels.level_2]: Classifications.intermediate,
+      [Levels.level_3]: Classifications.advanced,
+      [Levels.level_init]: Classifications.class_init
+    }
+
+    const trailClass = classMap[trailLevel as keyof typeof classMap]
+
+    const trailResult = trailLevel !== Levels.level_init ? Results.success : Results.failure
+
+    const trailInstance: Partial<TrailRow> = {
+      id: trail.id,
+      candidate_id: trail.candidate_id,
+      turns_m: currentIndex,
+      level: trailLevel,
+      result: trailResult,
+      class: trailClass
+    }
+
+    setTrailResults(trailInstance)
+    setTrail({ ...trailInstance } as TrailRow)
+    apis.updateTrail({ ...trailInstance } as TrailRow).then((data) => {
+      console.log('trail save: ', data)
+    })
+    setOpenDialog(true)
+    console.log('Trail complete:', trailInstance)
+  }, [seconds, level_1, level_2, level_3, currentIndex])
+
+  useEffect(() => {
     const cleanup = window.hardware.onData((data) => {
-      console.log('Arduino message in UI:', data)
-      setArduinoData(data)
+      // console.log('Arduino message in UI:', data)
       handleScroll()
+      setArduinoData(data)
     })
 
-    return () => cleanup() // Clean up on unmount
+    return () => cleanup()
   }, [])
-
-  const handleSend = async () => {
-    const success = await window.hardware.sendCommand('LED_ON')
-    if (!success) {
-      alert('Failed to send: Arduino might be disconnected!')
-    }
-  }
-
-  const handelReset = () => {
-    setCurrentIndex(0)
-    setLevel_1(false)
-    setLevel_2(false)
-    setLevel_3(false)
-    setCountdown(5)
-    setIsActive(false)
-    setisCountdownActive(false)
-    if (settings.trail_time) {
-      setSeconds(settings.trail_time)
-    }
-  }
 
   return (
     <>
       <section className="w-full h-screen flex flex-col">
+        <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+          <DialogContent className="p-0 z-[101] h-[60%] w-[900px] min-w-[900px] overflow-hidden">
+            <DialogHeader className="hidden">
+              <DialogTitle>Progress</DialogTitle>
+              <DialogDescription>This is a dialog for saving and resetting.</DialogDescription>
+            </DialogHeader>
+            <div className="w-full h-full flex">
+              <div className="w-[300px] bg-gray-400 flex flex-col gap-6 items-center justify-center p-4">
+                <label className="text-6xl font-black text-center">Time's up!</label>
+                <label
+                  className={`text-4xl font-bold text-center p-2 rounded-xl bg-white ${trailResults?.result === Results.success ? 'text-green-400' : 'text-red-400'}`}
+                >
+                  {trailResults?.result}
+                </label>
+                <p className="text-center text-gray-600">
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Veritatis nam vero
+                  accusamus minus quam dignissimos eius
+                </p>
+              </div>
+              <div className="flex-1 flex flex-col items-center justify-between">
+                <label>Progress</label>
+                <div className=" flex flex-col gap-2 items-center px-4">
+                  <label className="text-center text-[40px] font-black">
+                    {trailResults?.level}
+                  </label>
+                  <div className="flex w-max leading-none">
+                    <label className="text-center text-[120px] font-black">
+                      {trailResults?.turns_m}
+                      <span className="text-[40px]">t</span>
+                    </label>
+                    <label className="text-center text-[120px]">/</label>
+
+                    <label className="text-center text-[120px] font-black">
+                      {settings.trail_time}
+                      <span className="text-[40px]">s</span>
+                    </label>
+                  </div>
+                  <div className="flex items-center gap-2 justify-center">
+                    <div
+                      className={`h-[20px] w-[20px] rounded-full ${
+                        trailResults?.level === Levels.level_1
+                          ? 'bg-yellow-400'
+                          : trailResults?.level === Levels.level_2
+                            ? 'bg-orange-400'
+                            : trailResults?.level === Levels.level_3
+                              ? 'bg-green-400'
+                              : 'bg-black'
+                      }`}
+                    ></div>
+                    <label className="text-center text-[40px] font-black">
+                      {trailResults?.level === Levels.level_1
+                        ? 'Beginner'
+                        : trailResults?.level === Levels.level_2
+                          ? 'Intermediate'
+                          : trailResults?.level === Levels.level_3
+                            ? 'Advanced'
+                            : 'class_init'}
+                    </label>
+                  </div>
+                  <p className="text-center text-gray-600">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Veritatis nam vero
+                    accusamus minus quam dignissimos eius
+                  </p>
+                </div>
+                <div className="w-full flex justify-end">
+                  <div className="h-[60px] w-full flex">
+                    <Button className="min-h-full flex-1 rounded-none bg-gray-200 hover:bg-gray-400 text-black">
+                      Retry
+                    </Button>
+                    <Button variant="destructive" className="min-h-full flex-1 rounded-none">
+                      Exit
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
         <div className="relative w-full h-[80px] flex bg-[#E5E5E5]">
           <div className="h-full flex-1 flex">
             <Button
@@ -169,9 +293,9 @@ export default function Trail(): React.JSX.Element {
                   id: null,
                   candidate_id: null,
                   turns_m: null,
-                  elapsed_time: null,
                   result: null,
-                  level: null
+                  level: null,
+                  class: null
                 })
                 navigate('/')
               }}
@@ -341,7 +465,7 @@ export default function Trail(): React.JSX.Element {
                 <Play className="min-h-[30px] min-w-[30px]" />
               )}
             </Button>
-            <label>{arduinoData}</label>
+            {/* <label className="text-2xl font-bold">{arduinoData}</label> */}
           </div>
           <div className="relative bg-gray-400 w-[70%] h-[8px] flex justify-between items-center ">
             <div className="absolute h-full bg-transparent w-full flex">
@@ -428,6 +552,9 @@ export default function Trail(): React.JSX.Element {
             </div>
           </div>
           <Button className="absolute top-[30px] left-[30px]" onClick={handleScroll}>
+            Scroll Next
+          </Button>
+          <Button className="absolute top-[70px] left-[30px]" onClick={handleOpenDialog}>
             Scroll Next
           </Button>
         </div>

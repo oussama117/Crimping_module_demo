@@ -12,9 +12,9 @@ export const useTrailStore = create<TrailStore>((set) => ({
     id: null,
     candidate_id: null,
     turns_m: null,
-    elapsed_time: null,
     result: null,
-    level: null
+    level: null,
+    class: null
   },
   setTrail: (trail) => set({ trail }),
   resetTrail: () =>
@@ -23,9 +23,9 @@ export const useTrailStore = create<TrailStore>((set) => ({
         id: null,
         candidate_id: null,
         turns_m: null,
-        elapsed_time: null,
         result: null,
-        level: null
+        level: null,
+        class: null
       }
     })
 }))

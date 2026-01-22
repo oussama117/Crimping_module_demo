@@ -4,8 +4,6 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import AppDatabase from '../database/AppDatabase'
 import databaseHandler from '../database/ipcHandler'
-import { SerialPort } from 'serialport'
-import { ReadlineParser } from '@serialport/parser-readline'
 import { ArduinoBridge } from './hardware/arduinoBridge'
 
 let db: any
@@ -43,69 +41,14 @@ function createWindow(): void {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
 
-  arduino.init(mainWindow).catch((err) => {
-    console.error('Failed to initialize Arduino:', err)
-  })
-}
-
-interface SerialDevice {
-  index: number
-  path: string
-  manufacturer: string
-  device_name: string
-}
-
-// Global variable to hold the active port
-let activeArduinoPort
-
-async function connectToArduino() {
-  // 1. Get the list and find the Arduino path
-  const ports = await SerialPort.list()
-  const arduino = ports.find(
-    (port) => port.manufacturer?.includes('Arduino') || port.friendlyName?.includes('Arduino')
-  )
-
-  if (!arduino) {
-    console.error('❌ No Arduino detected. Please check the USB cable.')
-    return null
-  }
-
-  console.log(`🔌 Connecting to Arduino on ${arduino.path}...`)
-
-  // 2. Initialize the SerialPort
-  activeArduinoPort = new SerialPort({
-    path: arduino.path,
-    baudRate: 9600,
-    autoOpen: false // Better to handle opening manually for error catching
-  })
-
-  // 3. Open the connection
-  activeArduinoPort.open((err) => {
-    if (err) {
-      return console.error('Error opening port: ', err.message)
-    }
-    console.log('✅ Port Opened Successfully')
-  })
-
-  // 4. Attach a Parser (to read JSON lines easily)
-  const parser = activeArduinoPort.pipe(new ReadlineParser({ delimiter: '\r\n' }))
-
-  return { port: activeArduinoPort, parser }
-}
-
-// --- NEW FUNCTION: The Continuous Listener ---
-function startListening(parser) {
-  if (!parser) {
-    console.error('Cannot listen: Parser is undefined.')
-    return
-  }
-
-  console.log('👂 Listening for Arduino data...')
-
-  // The event trigger: runs every time a newline \r\n is detected
-  parser.on('data', (data) => {
-    console.log('Arduino sent:', data)
-  })
+  arduino
+    .init(mainWindow)
+    .then(() => {
+      console.error('Succsses to initialize Arduino:')
+    })
+    .catch((err) => {
+      console.error('Failed to initialize Arduino:', err)
+    })
 }
 
 // This method will be called when Electron has finished
@@ -114,18 +57,6 @@ function startListening(parser) {
 app.whenReady().then(async () => {
   db = new AppDatabase()
   databaseHandler(db)
-  // const connection = await connectToArduino()
-
-  // if (connection) {
-  //   startListening(connection.parser)
-  // }
-
-  // .then((obj) => {
-  //   console.log('connect: ', obj)
-  // })
-
-  // initHardware()
-  //setup database:
 
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')

@@ -156,11 +156,11 @@ class AppDatabase {
       }
 
       const trailStmt = this.db.prepare(`
-      INSERT INTO trail ( candidate_id, turns_m, time_elapsed, result, level )
+      INSERT INTO trail ( candidate_id, turns_m, result, level, class )
       VALUES (?, ?, ?, ?, ?)
       RETURNING *
     `)
-      const newTrail = trailStmt.get(newCandidate.id, -1, -1, 'init', 'level_init')
+      const newTrail = trailStmt.get(newCandidate.id, -1, 'init', 'level_init', 'class_init')
       if (!newTrail) {
         throw new Error('Failed to create trail: No data returned')
       }
@@ -206,31 +206,58 @@ class AppDatabase {
       return { success: false, error: error }
     }
   }
+
   public getTrailByCandidateId(candidateId: number): TrailRow {
     return this.db
       .prepare(`SELECT * FROM trail WHERE candidate_id = ?`)
       .get(candidateId) as TrailRow
   }
-  updateTrailResult(id: number, result: TrailRow, level: Levels, turns_m: number): void {
-    const stmt = this.db.prepare(`
+
+  public updateTrail(trail: TrailRow): { success: boolean; changes?: number; error?: string } {
+    try {
+      // 1. Validation: Ensure ID exists before attempting update
+      if (!trail.id) {
+        return { success: false, error: 'Missing Trail ID' }
+      }
+
+      const stmt = this.db.prepare(`
       UPDATE trail
-      SET result = ?, turns_m = ?, level = ?
-      WHERE candidateId = ?`)
-    stmt.run(result, turns_m, level, id)
+      SET turns_m = ?, result = ?, level = ?, class = ?
+      WHERE id = ?`)
+
+      const info = stmt.run(trail.turns_m, trail.result, trail.level, trail.class, trail.id)
+
+      // 2. Check if any row was actually updated
+      if (info.changes === 0) {
+        return { success: false, error: 'No trail found with that ID' }
+      }
+
+      return { success: true, changes: info.changes }
+    } catch (err) {
+      // 3. Catch database locks or schema errors
+      console.error('Database Update Error:', err)
+      return {
+        success: false,
+        error: err instanceof Error ? err.message : 'Unknown database error'
+      }
+    }
   }
 
   // Method to fetch all trails (for your Shadcn tables later)
   public getAllTrails(): TrailRow[] {
     return this.db.prepare('SELECT * FROM trail ORDER BY created_at DESC').all() as TrailRow[]
   }
+
   public getAllCandidates(): CandidateRow[] {
     return this.db
       .prepare('SELECT * FROM candidate ORDER BY created_at DESC')
       .all() as CandidateRow[]
   }
+
   public getSettings(): AppSettings {
     return this.db.prepare('SELECT * FROM app_settings WHERE id = 1').get() as AppSettings
   }
+
   public updateSettings(appSetting: AppSettings) {
     console.log('Updating settings in DB: ', appSetting)
 
@@ -249,6 +276,7 @@ class AppDatabase {
       appSetting.level_3
     )
   }
+
   public updateLanguage(language: Languages) {
     const stmt = this.db.prepare(`
       UPDATE app_settings SET language = ?
@@ -262,6 +290,7 @@ class AppDatabase {
     )
     console.log('Language update result:', result)
   }
+
   // Close the database connection gracefully
   closeDB(): void {
     this.db.close()

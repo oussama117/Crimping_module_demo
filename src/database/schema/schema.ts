@@ -3,9 +3,9 @@ export const __SCHEMA = `
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     candidate_id INTEGER NOT NULL, -- Logical Fix: Trail should point to Candidate
     turns_m INTEGER DEFAULT -1,
-    time_elapsed INTEGER DEFAULT -1,
     result TEXT CHECK(result IN ('success', 'failure', 'init')) DEFAULT 'init',
     level TEXT CHECK(level IN ('level_init', 'level_1', 'level_2', 'level_3')) DEFAULT 'level_init',
+    class TEXT CHECK(class IN ('class_init', 'beginner', 'intermediate', 'advanced')) DEFAULT 'class_init',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (candidate_id) REFERENCES candidate(id) ON DELETE CASCADE

@@ -14,7 +14,7 @@ export class ArduinoBridge {
     const arduino = ports.find((p) => p.manufacturer?.includes('Arduino'))
 
     if (arduino) {
-      this.port = new SerialPort({ path: arduino.path, baudRate: 9600 })
+      this.port = new SerialPort({ path: arduino.path, baudRate: 115200 })
       this.parser = this.port.pipe(new ReadlineParser({ delimiter: '\n' }))
 
       this.parser.on('data', (data) => {

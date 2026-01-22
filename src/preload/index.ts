@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
-import { AppSettings, Languages } from '@/types'
+import { AppSettings, Languages, TrailRow } from '@/types'
 
 // Custom APIs for renderer
 const api = {
@@ -21,6 +21,9 @@ const api = {
   },
   getTrailByCandidateId: (candidateId: number) => {
     return ipcRenderer.invoke('trail::getByCandidateId', candidateId)
+  },
+  updateTrail: (trail: TrailRow) => {
+    return ipcRenderer.invoke('trail::updateTrail', trail)
   }
 }
 

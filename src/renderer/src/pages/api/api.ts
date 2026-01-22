@@ -15,4 +15,8 @@ export default class apis {
   public static async getTrailByCandidateId(candidateId: number): Promise<TrailRow> {
     return await (window as any).api.getTrailByCandidateId(candidateId)
   }
+
+  public static async updateTrail(trail: TrailRow): Promise<TrailRow> {
+    return await (window as any).api.updateTrail(trail)
+  }
 }

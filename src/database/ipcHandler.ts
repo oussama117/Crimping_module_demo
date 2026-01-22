@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron'
 import AppDatabase from './AppDatabase'
-import { AppSettings, Languages } from '@/types'
+import { AppSettings, Languages, TrailRow } from '@/types'
 
 export default function databaseHandler(db: AppDatabase) {
   ipcMain.handle('candidate::create/get', (e, candidate_name: string, serial_number: number) => {
@@ -20,5 +20,8 @@ export default function databaseHandler(db: AppDatabase) {
   })
   ipcMain.handle('settings::updateLaguage', (e, language: Languages) => {
     return db.updateLanguage(language)
+  })
+  ipcMain.handle('trail::updateTrail', (e, trail: TrailRow) => {
+    return db.updateTrail(trail)
   })
 }
