@@ -10,7 +10,7 @@ import {
   ReturnCandidateDTO,
   AppSettings,
   Languages,
-  Levels
+  ErrorObject
 } from '@/types'
 
 class AppDatabase {
@@ -46,10 +46,11 @@ class AppDatabase {
 
   public getAllTrailJoinCandidate(): TrailJoinCandidate[] {
     try {
-      // Use aliases to prevent column name collisions
       const sql = `
       SELECT 
-        t.id as t_id, t.turns_m, t.seconds_elapsed, t.result, t.level, 
+        t.id as t_id, 
+        t.candidate_id as t_candidate_id, 
+        t.turns_m, t.result, t.level, t.class, 
         t.created_at as t_created, t.updated_at as t_updated,
         c.id as c_id, c.candidate_name, c.serial_number, 
         c.created_at as c_created, c.updated_at as c_updated
@@ -59,21 +60,25 @@ class AppDatabase {
     `
 
       const stmt = this.db.prepare(sql)
+
+      // We cast to 'any' initially because the SQL result is a flat object,
+      // not the nested TrailJoinCandidate interface yet.
       const rows = stmt.all() as any[]
 
-      // Map flat rows into your nested interface
       return rows.map((row) => ({
         id: row.t_id,
+        candidateId: row.t_candidate_id, // Fix: Use candidate_id, not t_id
         turns_m: row.turns_m,
-        time_elapsed: row.seconds_elapsed,
         result: row.result,
         level: row.level,
+        class: row.class,
         created_at: row.t_created,
         updated_at: row.t_updated,
         candidate: row.c_id
           ? {
               id: row.c_id,
               candidate_name: row.candidate_name,
+              // Ensure serial_number matches your interface (number | null)
               serial_number: row.serial_number ? Number(row.serial_number) : null,
               created_at: row.c_created,
               updated_at: row.c_updated
@@ -81,10 +86,7 @@ class AppDatabase {
           : null
       }))
     } catch (error) {
-      // Log the error for the developer
       console.error('SQL Error in getAllTrailJoinCandidate:', error)
-
-      // Return an empty array so the Frontend can still render (showing 0 results)
       return []
     }
   }
@@ -258,37 +260,71 @@ class AppDatabase {
     return this.db.prepare('SELECT * FROM app_settings WHERE id = 1').get() as AppSettings
   }
 
-  public updateSettings(appSetting: AppSettings) {
-    console.log('Updating settings in DB: ', appSetting)
+  public updateSettings(appSetting: AppSettings): ErrorObject {
+    try {
+      console.log('Updating settings in DB: ', appSetting)
 
-    const stmt = this.db.prepare(`
-      UPDATE app_settings SET language = ?, trail_time = ?, level_1 = ?, level_2 = ?, level_3 = ?
+      // 1. Simplify the language logic (Default to Arabic if something goes wrong)
+      const languageToSave = Object.values(Languages).includes(appSetting.language!)
+        ? appSetting.language
+        : Languages.fr
+
+      const stmt = this.db.prepare(`
+      UPDATE app_settings 
+      SET language = ?, trail_time = ?, level_1 = ?, level_2 = ?, level_3 = ?
       WHERE id = 1`)
-    stmt.run(
-      appSetting.language === Languages.fr
-        ? Languages.fr
-        : appSetting.language === Languages.en
-          ? Languages.en
-          : Languages.ar,
-      appSetting.trail_time,
-      appSetting.level_1,
-      appSetting.level_2,
-      appSetting.level_3
-    )
+
+      const info = stmt.run(
+        languageToSave,
+        appSetting.trail_time,
+        appSetting.level_1,
+        appSetting.level_2,
+        appSetting.level_3
+      )
+
+      // 2. Check if ID 1 actually exists
+      if (info.changes === 0) {
+        return { success: false, error: 'Settings row (ID: 1) not found in database.' }
+      }
+
+      return { success: true, changes: info.changes }
+    } catch (err) {
+      // 3. Catch structural errors (e.g., database file is read-only or column missing)
+      console.error('Database Update Error:', err)
+      return {
+        success: false,
+        error: err instanceof Error ? err.message : 'An unexpected database error occurred'
+      }
+    }
   }
 
-  public updateLanguage(language: Languages) {
-    const stmt = this.db.prepare(`
-      UPDATE app_settings SET language = ?
-      WHERE id = 1`)
-    const result = stmt.run(
-      language === Languages.fr
-        ? Languages.fr
-        : language === Languages.en
-          ? Languages.en
-          : Languages.ar
-    )
-    console.log('Language update result:', result)
+  public updateLanguage(language: Languages): ErrorObject {
+    try {
+      // 1. Cleaner validation logic
+      const validLanguages = Object.values(Languages)
+      const languageToSave = validLanguages.includes(language) ? language : Languages.ar
+
+      const stmt = this.db.prepare(`
+      UPDATE app_settings 
+      SET language = ? 
+      WHERE id = 1
+    `)
+
+      const result = stmt.run(languageToSave)
+
+      // 2. Check if the row actually existed
+      if (result.changes === 0) {
+        return { success: false, error: 'Settings record not found (ID 1 missing).' }
+      }
+
+      console.log('Language updated successfully to:', languageToSave)
+      return { success: true }
+    } catch (error) {
+      // 3. Catch DB locks or connection issues
+      const message = error instanceof Error ? error.message : 'Unknown DB error'
+      console.error('Failed to update language:', message)
+      return { success: false, error: message }
+    }
   }
 
   // Close the database connection gracefully

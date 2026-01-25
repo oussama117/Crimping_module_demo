@@ -19,7 +19,7 @@ export const useAppSettingsStore = create<AppSettingsStore>((set) => ({
     updated_at: null
   },
   loadAppSettings: async () => {
-    const settings = await (window as any).api.getSettings()
+    const settings = await window.api.getSettings()
     set({ settings })
   },
   setAppSettings: (settings) => set({ settings })

@@ -19,6 +19,7 @@ import { Languages } from '@/types'
 import apis from '../api/api'
 import { useCandidateStore } from '@renderer/store/useCandidateStore'
 import { useTrailStore } from '@renderer/store/useTrailStore'
+import { toast } from 'sonner'
 
 export default function RegistrationPage(): React.JSX.Element {
   const { t } = useTranslation()
@@ -41,6 +42,10 @@ export default function RegistrationPage(): React.JSX.Element {
       i18n.changeLanguage(settings.language)
     }
   }, [settings.language])
+
+  // useEffect(() => {
+  //   console.log('load settings: ', settings)
+  // }, [settings])
 
   const handleRegChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
@@ -161,10 +166,12 @@ export default function RegistrationPage(): React.JSX.Element {
             <div className="flex w-full p-6 border-t border-gray-400">
               <Button
                 className=" h-[90px] w-[140px] bg-[#D6D6D6] hover:bg-[#E5E5E5] cursor-pointer rounded-none flex flex-col items-center justify-center gap-2 text-xl text-black"
-                onClick={() => {}}
+                onClick={() => {
+                  navigate('/settings')
+                }}
               >
                 <Cog className="h-[50px] w-[50px] min-w-[25px] min-h-[25px]" />
-                <Label> {t('registration_page.settings_button')} </Label>
+                <Label className="cursor-pointer"> {t('registration_page.settings_button')} </Label>
               </Button>
               <Button
                 className="flex-1 h-[90px] border bg-[#D6D6D6] hover:bg-[#E5E5E5] cursor-pointer rounded-none flex flex-col items-center justify-center gap-2 text-xl text-black"
@@ -173,12 +180,12 @@ export default function RegistrationPage(): React.JSX.Element {
                 }}
               >
                 <ChartColumnIcon className="h-[50px] w-[50px] min-w-[25px] min-h-[25px]" />
-                <Label> {t('registration_page.score_button')} </Label>
+                <Label className="cursor-pointer"> {t('registration_page.score_button')} </Label>
               </Button>
             </div>
           </div>
         </section>
-        <div className="absolute top-4 right-4 text-black">
+        <div className="absolute bottom-6 left-6 text-black">
           <Select
             onValueChange={(value) => {
               setAppSettings({
@@ -190,20 +197,29 @@ export default function RegistrationPage(): React.JSX.Element {
                       ? Languages.en
                       : Languages.ar
               })
-              apis.updateLangauge(
-                value === Languages.fr
-                  ? Languages.fr
-                  : value === Languages.en
-                    ? Languages.en
-                    : Languages.ar
-              )
+              apis
+                .updateLangauge(
+                  value === Languages.fr
+                    ? Languages.fr
+                    : value === Languages.en
+                      ? Languages.en
+                      : Languages.ar
+                )
+                .then((data) => {
+                  // console.log('language change: ', data)
+                  if (data.success === true) {
+                    toast.info(`Language was successfully changed to ${settings.language}`)
+                  } else {
+                    alert(`Failed to change language err: ${data.error}`)
+                  }
+                })
             }}
             value={settings.language || Languages.fr}
           >
-            <SelectTrigger className="w-[120px]">
+            <SelectTrigger className="w-[120px] bg-white border border-gray-400 shadow-lg">
               <SelectValue placeholder="Language" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white">
               <SelectItem value="fr">Français 'fr'</SelectItem>
               <SelectItem value="en">English 'en'</SelectItem>
               <SelectItem value="ar">العربية 'ar'</SelectItem>

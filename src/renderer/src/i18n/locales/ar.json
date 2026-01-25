@@ -1,4 +1,7 @@
 {
+  "system": {
+    "close_app": "هل أنت متأكد من رغبتك في إغلاق تطبيق.؟ ستفقد جميع البيانات غير المحفوظة"
+  },
   "registration_page": {
     "title": "الوحدة التعليمية",
     "number": "رقم التسجيل",
@@ -15,13 +18,84 @@
     "reset_button": "إعادة ضبط",
     "settings_button": "الإعدادات",
     "start_point": "البداية",
+    "level_init": "أولي",
     "level_1": "المستوى-1",
     "level_2": "المستوى-2",
     "level_3": "المستوى-3",
     "time": "الوقت",
     "second": "ث",
+    "turn": "د",
     "start_button": "بدء",
     "pause_button": "إيقاف مؤقت",
-    "countdown": "يبدأ خلال..."
+    "countdown": "...يبدأ خلال",
+    "end_time": "!انتهى الوقت",
+    "dialog_title": "نتائج التجربة التعليمية",
+    "class": {
+      "class_init": "الاختبار الأولي",
+      "init": "الاختبار الأولي",
+      "beginner": "مبتدئ",
+      "intermediate": "متوسط",
+      "advanced": "متقدم"
+    },
+    "result": {
+      "init": "...في انتظار البدء",
+      "success": "!لقد نجحت",
+      "failure": "لقد فشلت"
+    },
+    "line": {
+      "failed": "!لا بأس",
+      "beginner": "!لقد بذلت قصارى جهدك",
+      "intermediate": "!لقد أبليت حسناً",
+      "advanced": "!أنت الفائز الحقيقي"
+    },
+    "success_p": ".يعرض هذا المربع نتائج أدائك. تهانينا على عملك الشاق! يمكنك الخروج إذا كنت قد انتهيت",
+    "failed_p": ".يعرض هذا المربع نتائج أدائك. يبدو أنه لم يتم تحقيق الهدف هذه المرة. حاول مرة أخرى بالضغط على 'إعادة المحاولة'، أو 'خروج' للإنهاء",
+    "try_again_button": "إعادة المحاولة",
+    "exit_button": "خروج"
+  },
+  "settings_page": {
+    "title": "الإعدادات",
+    "settings_page_info": ".تعرض هذه الصفحة الإعدادات العامة للتطبيق",
+    "language_setting": " :اللغة",
+    "language_setting_info": ".اختر لغتك المفضلة من خلال قائمة الاختيار",
+    "trial_time_setting": "وقت التجربة بالثواني (60 ثانية كحد أدنى)",
+    "trial_time_placeholder": "حدد وقت التجربة هنا",
+    "trial_time_setting_info": ".اكتب وقت التجربة بالثواني في حقل الإدخال أعلاه",
+    "levels_title": ":المستويات",
+    "levels_setting_info": ".اكتب عدد الدورات لكل مستوى في حقول الإدخال أدناه",
+    "level_1_setting": "المستوى 1",
+    "level_1_placeholder": "حدد المستوى 1 هنا",
+    "level_2_setting": "المستوى 2",
+    "level_2_placeholder": "حدد المستوى 2 هنا",
+    "level_3_setting": "المستوى 3",
+    "level_3_placeholder": "حدد المستوى 3 هنا",
+    "default_button": "افتراضي",
+    "save_button": "حفظ",
+    "confirm_button": "متابعة",
+    "cancel_button": "إلغاء",
+    "confirm_message": "هل تريد حفظ التغييرات في الإعدادات؟",
+    "search": "البحث عن مرشح",
+    "trial_ref": "مراجع الاختبار"
+  },
+  "score_board": {
+    "table_header": {
+      "candidate_name": "اسم المترشح",
+      "serial_number": "الرقم التسلسلي",
+      "level": "المستوى",
+      "classification": "التصنيف",
+      "turns": "الدورات",
+      "result": "النتيجة",
+      "date": "التاريخ",
+      "actions": "الإجراءات"
+    },
+    "results": {
+      "init": "أولي",
+      "success": "ناجح",
+      "failure": "راسب"
+    },
+    "no_results": "لم يتم العثور على نتائج.",
+    "download_excel_button": "تحميل ملف Excel",
+    "check_init": "تضمين المرشحين الأوليين",
+    "delete_button": "حذف"
   }
 }

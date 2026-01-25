@@ -1,4 +1,7 @@
 {
+  "system": {
+    "close_app": "Êtes-vous sûr de vouloir fermer l'application ? Toutes les données non sauvegardées seront perdues."
+  },
   "registration_page": {
     "title": "DIDACTIQUE",
     "number": "MATRICULE CANDIDAT",
@@ -15,13 +18,84 @@
     "reset_button": "Réinitialiser",
     "settings_button": "Paramètres",
     "start_point": "Départ",
+    "level_init": "Initial",
     "level_1": "Niveau-1",
     "level_2": "Niveau-2",
     "level_3": "Niveau-3",
     "time": "Temps",
     "second": "s",
+    "turn": "t",
     "start_button": "Démarrer",
     "pause_button": "Pause",
-    "countdown": "Commencement dans..."
+    "countdown": "Commencement dans...",
+    "end_time": "Temps écoulé !",
+    "dialog_title": "Résultats de l'essai",
+    "class": {
+      "class_init": "Initial",
+      "init": "Initial",
+      "beginner": "Débutant",
+      "intermediate": "Intermédiaire",
+      "advanced": "Avancé"
+    },
+    "result": {
+      "init": "En attente...",
+      "success": "Vous avez réussi !",
+      "failure": "Vous avez échoué"
+    },
+    "line": {
+      "failed": "C'est pas grave !",
+      "beginner": "Tu as fait de ton mieux !",
+      "intermediate": "C'est du bon travail !",
+      "advanced": "Tu es le vrai gagnant !"
+    },
+    "success_p": "Voici vos résultats. Félicitations pour vos efforts ! Vous pouvez quitter si vous avez terminé.",
+    "failed_p": "Voici vos résultats. L'objectif n'est pas atteint. Cliquez sur 'Réessayer' ou sur 'Quitter' pour finir.",
+    "try_again_button": "Réessayer",
+    "exit_button": "Quitter"
+  },
+  "settings_page": {
+    "title": "Paramètres",
+    "settings_page_info": "Cette page affiche les paramètres généraux de l'application.",
+    "language_setting": "Langue: ",
+    "language_setting_info": "Sélectionnez votre langue préférée via le menu de sélection.",
+    "trial_time_setting": "Temps d'essai en secondes (min 60s)",
+    "trial_time_placeholder": "Régler le temps ici",
+    "trial_time_setting_info": "Saisissez le temps d'essai en secondes dans le champ ci-dessus.",
+    "levels_title": "Niveaux: ",
+    "levels_setting_info": "Saisissez le nombre de tours par niveau dans les champs ci-dessous.",
+    "level_1_setting": "Niveau 1",
+    "level_1_placeholder": "Régler le niveau 1",
+    "level_2_setting": "Niveau 2",
+    "level_2_placeholder": "Régler le niveau 2",
+    "level_3_setting": "Niveau 3",
+    "level_3_placeholder": "Régler le niveau 3",
+    "default_button": "Par défaut",
+    "save_button": "Enregistrer",
+    "confirm_button": "Continuer",
+    "cancel_button": "Abandonner",
+    "confirm_message": "Voulez-vous enregistrer les modifications des paramètres ?",
+    "search": "Rechercher un candidat",
+    "trial_ref": "Références de l'essai"
+  },
+  "score_board": {
+    "table_header": {
+      "candidate_name": "Nom du Candidat",
+      "serial_number": "Numéro de Série",
+      "level": "Niveau",
+      "classification": "Classification",
+      "turns": "Tours",
+      "result": "Résultat",
+      "date": "Date",
+      "actions": "Actions"
+    },
+    "results": {
+      "init": "Initial",
+      "success": "Succès",
+      "failure": "Échec"
+    },
+    "no_results": "Aucun résultat trouvé.",
+    "download_excel_button": "Télécharger Excel",
+    "check_init": "Inclure les candidats initiaux",
+    "delete_button": "Supprimer"
   }
 }

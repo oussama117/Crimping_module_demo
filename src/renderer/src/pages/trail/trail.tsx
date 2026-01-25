@@ -1,6 +1,6 @@
 import { Button } from '@renderer/components/ui/button'
 import { Label } from '@renderer/components/ui/label'
-import { ArrowBigLeft, CircleUser, Cog, Pause, Play, RotateCcw } from 'lucide-react'
+import { ArrowBigLeft, CircleUser, ClockCheck, Cog, Pause, Play, RotateCcw } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import yazakiLogo from '../../assets/logo.png'
 import { useEffect, useState } from 'react'
@@ -17,6 +17,7 @@ import {
   DialogTitle
 } from '@renderer/components/ui/dialog'
 import apis from '../api/api'
+import trailBg from '../../assets/trail_bg.png'
 
 export default function Trail(): React.JSX.Element {
   // DECLARATIONS
@@ -42,12 +43,12 @@ export default function Trail(): React.JSX.Element {
   const [isActive, setIsActive] = useState(false)
   const [openDialog, setOpenDialog] = useState(false)
   const [trailResults, setTrailResults] = useState<Partial<TrailRow>>()
-  const [arduinoData, setArduinoData] = useState<any>()
+  // const [arduinoData, setArduinoData] = useState<any>()
 
   const strokeWidth = 20 // Adjust thickness here
   const radius = 190 - strokeWidth
   const circumference = 2 * Math.PI * radius
-  const progress = seconds / 60
+  const progress = seconds / (settings.trail_time || 60)
   const dashOffset = circumference - progress * circumference
   const svgCentre = (itemWidth * 3) / 2
 
@@ -84,31 +85,14 @@ export default function Trail(): React.JSX.Element {
     }
   }
 
-  const handleOpenDialog = () => {
-    openDialog ? setOpenDialog(false) : setOpenDialog(true)
-  }
-
   // USEEFFECTS ==================================================
 
   useEffect(() => {
-    const l1 = settings.level_1 != null && currentIndex >= settings.level_1
-    const l2 = settings.level_2 != null && currentIndex >= settings.level_2
-    const l3 = settings.level_3 != null && currentIndex >= settings.level_3
-
-    setLevel_1(l1)
-    setLevel_2(l2)
-    setLevel_3(l3)
-
-    if (l3) handleSend('1111')
-    else if (l2) handleSend('1110')
-    else if (l1) handleSend('1100')
+    if (level_3) handleSend('1111')
+    else if (level_2) handleSend('1110')
+    else if (level_1) handleSend('1100')
     else handleSend('1000')
-  }, [currentIndex, settings])
-
-  useEffect(() => {
-    console.log('candidate from trail: ', candidate)
-    console.log('trail from trail: ', trail)
-  }, [trail])
+  }, [currentIndex, settings, level_1, level_2, level_3])
 
   useEffect(() => {
     let interval: NodeJS.Timeout
@@ -117,6 +101,7 @@ export default function Trail(): React.JSX.Element {
       interval = setInterval(() => {
         setCountdown((prev) => {
           if (prev <= 1) {
+            setCurrentIndex(0)
             setIsActive(true)
             clearInterval(interval)
             return 0
@@ -151,12 +136,29 @@ export default function Trail(): React.JSX.Element {
   }, [isActive, settings.trail_time])
 
   useEffect(() => {
-    if (seconds !== 0) return
+    const l1 = settings.level_1 != null && currentIndex >= settings.level_1
+    const l2 = settings.level_2 != null && currentIndex >= settings.level_2
+    const l3 = settings.level_3 != null && currentIndex >= settings.level_3
+    // console.log('currentIndex: ', currentIndex)
+
+    setLevel_1(l1)
+    setLevel_2(l2)
+    setLevel_3(l3)
+    // Determine if the trial should finish
+    const isTimeOut = seconds === 0
+    const isWorkFinished = currentIndex === numbers.length - 1
+
+    // If neither condition is met, do nothing and wait
+    if (openDialog === true) return
+    if (seconds === settings.trail_time) return
+    if (!isTimeOut && !isWorkFinished) return
+    // if (!isActive) return
+    // console.log('numbers.length: ', numbers.length)
 
     let trailLevel = Levels.level_init
-    if (level_3) trailLevel = Levels.level_3
-    else if (level_2) trailLevel = Levels.level_2
-    else if (level_1) trailLevel = Levels.level_1
+    if (l3) trailLevel = Levels.level_3
+    else if (l2) trailLevel = Levels.level_2
+    else if (l1) trailLevel = Levels.level_1
 
     const classMap = {
       [Levels.level_1]: Classifications.beginner,
@@ -179,19 +181,27 @@ export default function Trail(): React.JSX.Element {
     }
 
     setTrailResults(trailInstance)
+    console.log('trial: ', trailInstance)
     setTrail({ ...trailInstance } as TrailRow)
     apis.updateTrail({ ...trailInstance } as TrailRow).then((data) => {
       console.log('trail save: ', data)
+      if (!data.success) {
+        // console.error('error updating ')
+        alert(`error updating err: ${data.error}`)
+      }
     })
+
     setOpenDialog(true)
-    console.log('Trail complete:', trailInstance)
+    // console.log('Trail complete:', trailInstance)
   }, [seconds, level_1, level_2, level_3, currentIndex])
 
   useEffect(() => {
-    const cleanup = window.hardware.onData((data) => {
+    const cleanup = window.hardware.onData(() => {
       // console.log('Arduino message in UI:', data)
-      handleScroll()
-      setArduinoData(data)
+      if (seconds > 0) {
+        handleScroll()
+      }
+      // setArduinoData(data)
     })
 
     return () => cleanup()
@@ -201,40 +211,45 @@ export default function Trail(): React.JSX.Element {
     <>
       <section className="w-full h-screen flex flex-col">
         <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-          <DialogContent className="p-0 z-[101] h-[60%] w-[900px] min-w-[900px] overflow-hidden">
+          <DialogContent className="p-0 z-[101] h-[60%] w-[900px] min-w-[900px] overflow-hidden [&>button]:hidden">
             <DialogHeader className="hidden">
               <DialogTitle>Progress</DialogTitle>
               <DialogDescription>This is a dialog for saving and resetting.</DialogDescription>
             </DialogHeader>
             <div className="w-full h-full flex">
-              <div className="w-[300px] bg-gray-400 flex flex-col gap-6 items-center justify-center p-4">
-                <label className="text-6xl font-black text-center">Time's up!</label>
-                <label
-                  className={`text-4xl font-bold text-center p-2 rounded-xl bg-white ${trailResults?.result === Results.success ? 'text-green-400' : 'text-red-400'}`}
-                >
-                  {trailResults?.result}
+              <div className="relative w-[300px] bg-gray-600 flex flex-col gap-4 items-center justify-center p-4 overflow-hidden text-white">
+                <ClockCheck className="z-[1] min-w-[80px] min-h-[80px]" />
+                <label className="z-[1] text-5xl font-black text-center">
+                  {t('trail_page.end_time')}
                 </label>
-                <p className="text-center text-gray-600">
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Veritatis nam vero
-                  accusamus minus quam dignissimos eius
-                </p>
+                <label className={`text-xl text-center z-[1] `}>
+                  {t(`trail_page.result.${trailResults?.result}`)}
+                </label>
+                <img
+                  src={trailBg}
+                  alt="taping module"
+                  className="absolute w-[500px] min-w-[500px] opacity-[20%]  left-[-70%]"
+                />
               </div>
               <div className="flex-1 flex flex-col items-center justify-between">
-                <label>Progress</label>
+                <label className="mt-[20px] text-xl font-bold">
+                  {t('trail_page.dialog_title')}
+                </label>
                 <div className=" flex flex-col gap-2 items-center px-4">
                   <label className="text-center text-[40px] font-black">
-                    {trailResults?.level}
+                    {t(`trail_page.${trailResults?.level}`)}
                   </label>
                   <div className="flex w-max leading-none">
                     <label className="text-center text-[120px] font-black">
                       {trailResults?.turns_m}
-                      <span className="text-[40px]">t</span>
+                      <span className="text-[40px] font-bold">{t('trail_page.turn')}</span>
                     </label>
-                    <label className="text-center text-[120px]">/</label>
-
-                    <label className="text-center text-[120px] font-black">
+                    <label className="text-center text-[120px] text-gray-600">/</label>
+                    <label className="text-center text-[120px] font-black text-gray-600">
                       {settings.trail_time}
-                      <span className="text-[40px]">s</span>
+                      <span className="text-[40px] font-bold text-gray-600">
+                        {t('trail_page.second')}
+                      </span>
                     </label>
                   </div>
                   <div className="flex items-center gap-2 justify-center">
@@ -250,27 +265,50 @@ export default function Trail(): React.JSX.Element {
                       }`}
                     ></div>
                     <label className="text-center text-[40px] font-black">
-                      {trailResults?.level === Levels.level_1
-                        ? 'Beginner'
-                        : trailResults?.level === Levels.level_2
-                          ? 'Intermediate'
-                          : trailResults?.level === Levels.level_3
-                            ? 'Advanced'
-                            : 'class_init'}
+                      {t(`trail_page.class.${trailResults?.class}`)}
                     </label>
                   </div>
-                  <p className="text-center text-gray-600">
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Veritatis nam vero
-                    accusamus minus quam dignissimos eius
-                  </p>
+                  <div className="flex flex-col items-center justify-center">
+                    {trailResults?.result === Results.failure ? (
+                      <label className="text-lg text-center">{t(`trail_page.line.failed`)}</label>
+                    ) : (
+                      <label className="text-lg text-center">
+                        {t(`trail_page.line.${trailResults?.class}`)}
+                      </label>
+                    )}
+                    {trailResults?.result === Results.failure ? (
+                      <p className="text-center text-gray-600">{t('trail_page.failed_p')}</p>
+                    ) : (
+                      <p className="text-center text-gray-600">{t('trail_page.success_p')}</p>
+                    )}
+                  </div>
                 </div>
                 <div className="w-full flex justify-end">
                   <div className="h-[60px] w-full flex">
-                    <Button className="min-h-full flex-1 rounded-none bg-gray-200 hover:bg-gray-400 text-black">
-                      Retry
+                    <Button
+                      onClick={() => {
+                        handelReset()
+                        setOpenDialog(false)
+                      }}
+                      className="min-h-full flex-1 rounded-none bg-gray-600 cursor-pointer hover:opacity-[70%]"
+                    >
+                      <RotateCcw className="min-w-[20px] min-h-[20px]" />
+                      <label className="text-lg font-bold cursor-pointer text-white">
+                        {t('trail_page.try_again_button')}
+                      </label>
                     </Button>
-                    <Button variant="destructive" className="min-h-full flex-1 rounded-none">
-                      Exit
+                    <Button
+                      onClick={() => {
+                        handelReset()
+                        setOpenDialog(false)
+                        navigate('/')
+                      }}
+                      className="min-h-full flex-1 bg-[#DA5949] hover:bg-[#D88D87] cursor-pointer rounded-none"
+                    >
+                      <ArrowBigLeft className="min-w-[20px] min-h-[20px]" />
+                      <label className="text-lg font-bold cursor-pointer text-white">
+                        {t('trail_page.exit_button')}
+                      </label>
                     </Button>
                   </div>
                 </div>
@@ -312,7 +350,9 @@ export default function Trail(): React.JSX.Element {
             </Button>
             <Button
               className="cursor-pointer hover:bg-gray-400 hover:text-white flex flex-col items-center justify-center bg-transparent text-gray-600 h-full w-[140px] rounded-none"
-              onClick={() => {}}
+              onClick={() => {
+                navigate('/settings')
+              }}
             >
               <Cog />
               <Label className="cursor-pointer">{t('trail_page.settings_button')}</Label>
@@ -551,12 +591,12 @@ export default function Trail(): React.JSX.Element {
               </label>
             </div>
           </div>
-          <Button className="absolute top-[30px] left-[30px]" onClick={handleScroll}>
+          {/* <Button className="absolute top-[30px] left-[30px]" onClick={handleScroll}>
             Scroll Next
           </Button>
           <Button className="absolute top-[70px] left-[30px]" onClick={handleOpenDialog}>
             Scroll Next
-          </Button>
+          </Button> */}
         </div>
         {isCountdownActive && countdown != 0 ? (
           <div className="z-[200] absolute h-full w-full bg-[#ffffffb8] flex flex-col items-center justify-center">
@@ -566,6 +606,16 @@ export default function Trail(): React.JSX.Element {
         ) : (
           ''
         )}
+        <img
+          src={trailBg}
+          alt="taping module"
+          className="absolute z-[-1] h-[55%] opacity-[20%] right-[-80px]"
+        />
+        {/* <img
+          src={trailBg}
+          alt="taping module"
+          className="absolute z-[-1] h-[55%] opacity-[20%] bottom-[0%] left-[-200px]"
+        /> */}
       </section>
     </>
   )

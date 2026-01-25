@@ -4,6 +4,8 @@ import { AppSettings, Languages, TrailRow } from '@/types'
 
 // Custom APIs for renderer
 const api = {
+  requestAppClose: () => ipcRenderer.send('request-app-close'),
+
   createOrGetCandidate: (candidate_name: string, serial_number: number) => {
     return ipcRenderer.invoke('candidate::create/get', candidate_name, serial_number)
   },
@@ -24,6 +26,12 @@ const api = {
   },
   updateTrail: (trail: TrailRow) => {
     return ipcRenderer.invoke('trail::updateTrail', trail)
+  },
+  deleteCandidateAndTrail: (candidateId: number) => {
+    return ipcRenderer.invoke('candidate/trail::delete', candidateId)
+  },
+  deleteManually: (candidateId: number) => {
+    return ipcRenderer.invoke('candidate/trail::deleteManually', candidateId)
   }
 }
 

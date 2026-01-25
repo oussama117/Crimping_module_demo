@@ -3,6 +3,7 @@ export * from './interfaces/Candidate'
 export * from './interfaces/returnCandidateDTO'
 export * from './interfaces/Trail'
 export * from './interfaces/app_settings'
+export * from './interfaces/error'
 
 // enums
 export * from './enums/levels'

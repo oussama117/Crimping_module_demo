@@ -1,4 +1,7 @@
 {
+  "system": {
+    "close_app": "Are you sure you want to close the App? All unsaved data will be lost."
+  },
   "registration_page": {
     "title": "DIDACTIC",
     "number": "REGISTRATION NUMBER",
@@ -15,13 +18,84 @@
     "reset_button": "Reset",
     "settings_button": "Settings",
     "start_point": "Start",
+    "level_init": "Initial",
     "level_1": "Level-1",
     "level_2": "Level-2",
     "level_3": "Level-3",
     "time": "Time",
     "second": "s",
+    "turn": "t",
     "start_button": "Start",
     "pause_button": "Pause",
-    "countdown": "Commencing in..."
+    "countdown": "Commencing in...",
+    "end_time": "Time's up!",
+    "dialog_title": "Didactic Trial Results",
+    "class": {
+      "class_init": "Initial",
+      "init": "Initial",
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced"
+    },
+    "result": {
+      "init": "Waiting to start...",
+      "success": "You have succeeded!",
+      "failure": "You have failed"
+    },
+    "line": {
+      "failed": "It's OK!",
+      "beginner": "You did your best!",
+      "intermediate": "You did good!",
+      "advanced": "You are the true winner!"
+    },
+    "success_p": "This dialog shows your performance. Congratulations on your hard work! You can exit if you are finished.",
+    "failed_p": "This dialog shows your performance. It seems the goal wasn't met this time. Try again by pressing 'Try Again', or press 'Exit' to finish.",
+    "try_again_button": "Try Again",
+    "exit_button": "Exit"
+  },
+  "settings_page": {
+    "title": "Settings",
+    "settings_page_info": "This page shows the application's general settings.",
+    "language_setting": "Language: ",
+    "language_setting_info": "Select your preferred language through the selection menu.",
+    "trial_time_setting": "Trial time in seconds (minimum 60s)",
+    "trial_time_placeholder": "Set trial time here",
+    "trial_time_setting_info": "Type the trial time in seconds in the input field above.",
+    "levels_title": "Levels: ",
+    "levels_setting_info": "Type the number of turns per level in the level inputs below.",
+    "level_1_setting": "Level 1",
+    "level_1_placeholder": "Set level 1 here",
+    "level_2_setting": "Level 2",
+    "level_2_placeholder": "Set level 2 here",
+    "level_3_setting": "Level 3",
+    "level_3_placeholder": "Set level 3 here",
+    "default_button": "Default",
+    "save_button": "Save",
+    "confirm_button": "Proceed",
+    "cancel_button": "Abort",
+    "confirm_message": "Do you want to save changes to the settings?",
+    "search": "Search for candidate",
+    "trial_ref": "Trial References"
+  },
+  "score_board": {
+    "table_header": {
+      "candidate_name": "Candidate Name",
+      "serial_number": "Serial Number",
+      "level": "Level",
+      "classification": "Classification",
+      "turns": "Turns",
+      "result": "Result",
+      "date": "Date",
+      "actions": "Actions"
+    },
+    "results": {
+      "init": "Initial",
+      "success": "Success",
+      "failure": "Failed"
+    },
+    "no_results": "No results found.",
+    "download_excel_button": "Download Excel",
+    "check_init": "Include initial candidates",
+    "delete_button": "Delete"
   }
 }

@@ -12,8 +12,9 @@ const arduino = new ArduinoBridge()
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 670,
+    fullscreen: true,
+    // width: 1200,
+    // height: 670,
     show: false,
     autoHideMenuBar: true,
     // alwaysOnTop: true,
@@ -41,14 +42,9 @@ function createWindow(): void {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
 
-  arduino
-    .init(mainWindow)
-    .then(() => {
-      console.error('Succsses to initialize Arduino:')
-    })
-    .catch((err) => {
-      console.error('Failed to initialize Arduino:', err)
-    })
+  arduino.init(mainWindow).catch((err) => {
+    console.error('Failed to initialize Arduino:', err)
+  })
 }
 
 // This method will be called when Electron has finished
@@ -70,6 +66,18 @@ app.whenReady().then(async () => {
 
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
+
+  ipcMain.on('request-app-close', () => {
+    console.log('Closing database and exiting...')
+
+    // 1. Close the DB (Replace with your actual db instance call)
+    if (db) {
+      db.closeDB()
+    }
+
+    // 2. Quit the app
+    app.quit()
+  })
 
   createWindow()
 
