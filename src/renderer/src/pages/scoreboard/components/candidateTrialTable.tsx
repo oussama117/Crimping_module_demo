@@ -1,4 +1,4 @@
-import { TrailJoinCandidate } from '@/types'
+import { TrialJoinCandidate } from '@/types'
 import { Button } from '@renderer/components/ui/button'
 import {
   Table,
@@ -13,7 +13,7 @@ import { Trash2Icon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 interface Props {
-  trials: TrailJoinCandidate[]
+  trials: TrialJoinCandidate[]
   onDelete: (id: number) => void
 }
 
@@ -29,7 +29,7 @@ export function CandidateTrialsTable({ onDelete, trials }: Props) {
 
     try {
       // 2. Database Update
-      const response = await apis.deleteCandidateAndTrail(candidateId)
+      const response = await apis.deleteCandidateAndTrial(candidateId)
 
       if (!response) {
         console.error('Delete failed in database')
@@ -49,6 +49,7 @@ export function CandidateTrialsTable({ onDelete, trials }: Props) {
             <TableHead>{t('score_board.table_header.level')}</TableHead>
             <TableHead>{t('score_board.table_header.classification')}</TableHead>
             <TableHead>{t('score_board.table_header.turns')}</TableHead>
+            <TableHead>{t('score_board.table_header.remaining_time')}</TableHead>
             <TableHead>{t('score_board.table_header.result')}</TableHead>
             <TableHead>{t('score_board.table_header.date')}</TableHead>
             <TableHead className="text-center">{t('score_board.table_header.actions')}</TableHead>
@@ -64,12 +65,13 @@ export function CandidateTrialsTable({ onDelete, trials }: Props) {
                 </TableCell>
                 <TableCell>{trial.candidate?.serial_number || 'N/A'}</TableCell>
 
-                {/* Trial Details - Using trail_page translation paths */}
-                <TableCell>{trial.level ? t(`trail_page.${trial.level}`) : 'N/A'}</TableCell>
-                <TableCell>{trial.class ? t(`trail_page.class.${trial.class}`) : 'N/A'}</TableCell>
+                {/* Trial Details - Using trial_page translation paths */}
+                <TableCell>{trial.level ? t(`trial_page.${trial.level}`) : 'N/A'}</TableCell>
+                <TableCell>{trial.class ? t(`trial_page.class.${trial.class}`) : 'N/A'}</TableCell>
                 <TableCell>{trial.turns_m === -1 ? 'N/A' : trial.turns_m}</TableCell>
 
                 {/* Result as Plain Text - Using score_board path */}
+                <TableCell>{trial.remaining_time ? trial.remaining_time : 'N/A'}</TableCell>
                 <TableCell>
                   {trial.result ? t(`score_board.results.${trial.result}`) : 'N/A'}
                 </TableCell>

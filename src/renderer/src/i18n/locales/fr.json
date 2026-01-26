@@ -12,7 +12,7 @@
     "name_error": "Le nom ne peut pas être vide",
     "score_button": "TABLEAU DE SCORE"
   },
-  "trail_page": {
+  "trial_page": {
     "title": "DIDACTIQUE",
     "return_button": "Retour",
     "reset_button": "Réinitialiser",
@@ -55,9 +55,13 @@
   },
   "settings_page": {
     "title": "Paramètres",
+    "init_settings": "Paramètres actuels",
     "settings_page_info": "Cette page affiche les paramètres généraux de l'application.",
     "language_setting": "Langue: ",
     "language_setting_info": "Sélectionnez votre langue préférée via le menu de sélection.",
+    "module_number_setting": "Numéro du module",
+    "module_number_placeholder": "Définir le numéro du module ici",
+    "module_number_setting_info": "Tapez le numéro du module didactique.",
     "trial_time_setting": "Temps d'essai en secondes (min 60s)",
     "trial_time_placeholder": "Régler le temps ici",
     "trial_time_setting_info": "Saisissez le temps d'essai en secondes dans le champ ci-dessus.",
@@ -84,6 +88,7 @@
       "level": "Niveau",
       "classification": "Classification",
       "turns": "Tours",
+      "remaining_time": "Temps restant",
       "result": "Résultat",
       "date": "Date",
       "actions": "Actions"

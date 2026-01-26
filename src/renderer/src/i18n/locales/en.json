@@ -12,7 +12,7 @@
     "name_error": "name can not be empty",
     "score_button": "SCORE BOARD"
   },
-  "trail_page": {
+  "trial_page": {
     "title": "DIDACTIC",
     "return_button": "Return",
     "reset_button": "Reset",
@@ -55,9 +55,13 @@
   },
   "settings_page": {
     "title": "Settings",
+    "init_settings": "Current Settings",
     "settings_page_info": "This page shows the application's general settings.",
     "language_setting": "Language: ",
     "language_setting_info": "Select your preferred language through the selection menu.",
+    "module_number_setting": "Module number",
+    "module_number_placeholder": "Set module number here",
+    "module_number_setting_info": "Type the didactic module number.",
     "trial_time_setting": "Trial time in seconds (minimum 60s)",
     "trial_time_placeholder": "Set trial time here",
     "trial_time_setting_info": "Type the trial time in seconds in the input field above.",
@@ -84,6 +88,7 @@
       "level": "Level",
       "classification": "Classification",
       "turns": "Turns",
+      "remaining_time": "Remaining time",
       "result": "Result",
       "date": "Date",
       "actions": "Actions"

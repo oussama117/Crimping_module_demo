@@ -12,7 +12,7 @@
     "name_error": "الاسم لا يمكن أن يكون فارغاً",
     "score_button": "لوحة النتائج"
   },
-  "trail_page": {
+  "trial_page": {
     "title": "الوحدة التعليمية",
     "return_button": "عودة",
     "reset_button": "إعادة ضبط",
@@ -55,9 +55,13 @@
   },
   "settings_page": {
     "title": "الإعدادات",
+    "init_settings": "الإعدادات الحالية",
     "settings_page_info": ".تعرض هذه الصفحة الإعدادات العامة للتطبيق",
     "language_setting": " :اللغة",
     "language_setting_info": ".اختر لغتك المفضلة من خلال قائمة الاختيار",
+    "module_number_setting": "رقم الوحدة",
+    "module_number_placeholder": "ضع رقم الوحدة هنا",
+    "module_number_setting_info": ".اكتب رقم الوحدة التعليمية",
     "trial_time_setting": "وقت التجربة بالثواني (60 ثانية كحد أدنى)",
     "trial_time_placeholder": "حدد وقت التجربة هنا",
     "trial_time_setting_info": ".اكتب وقت التجربة بالثواني في حقل الإدخال أعلاه",
@@ -84,6 +88,7 @@
       "level": "المستوى",
       "classification": "التصنيف",
       "turns": "الدورات",
+      "remaining_time": "الوقت المتبقي",
       "result": "النتيجة",
       "date": "التاريخ",
       "actions": "الإجراءات"

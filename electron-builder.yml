@@ -12,8 +12,8 @@ files:
 asarUnpack:
   - resources/**
 win:
-  icon: build/logo.ico
-  executableName: taping_demo
+  icon: build/taping_icon.ico
+  executableName: Taping_module
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}

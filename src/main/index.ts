@@ -13,6 +13,7 @@ function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     fullscreen: true,
+    title: 'Taping module',
     // width: 1200,
     // height: 670,
     show: false,

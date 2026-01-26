@@ -11,10 +11,11 @@ export const useAppSettingsStore = create<AppSettingsStore>((set) => ({
   settings: {
     id: null,
     language: null,
-    trail_time: null,
+    trial_time: null,
     level_1: null,
     level_2: null,
     level_3: null,
+    module_number: null,
     created_at: null,
     updated_at: null
   },

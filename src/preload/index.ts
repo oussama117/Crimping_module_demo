@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
-import { AppSettings, Languages, TrailRow } from '@/types'
+import { AppSettings, Languages, TrialRow } from '@/types'
 
 // Custom APIs for renderer
 const api = {
@@ -9,29 +9,29 @@ const api = {
   createOrGetCandidate: (candidate_name: string, serial_number: number) => {
     return ipcRenderer.invoke('candidate::create/get', candidate_name, serial_number)
   },
-  getTrailJoinCandidate: () => {
-    return ipcRenderer.invoke('trail/candidate::getAll')
+  getTrialJoinCandidate: () => {
+    return ipcRenderer.invoke('trial/candidate::getAll')
   },
-  getSettings: () => {
-    return ipcRenderer.invoke('settings::getSetting')
+  getTrialByCandidateId: (candidateId: number) => {
+    return ipcRenderer.invoke('trial::getByCandidateId', candidateId)
+  },
+  updateTrial: (trial: TrialRow) => {
+    return ipcRenderer.invoke('trial::updateTrial', trial)
+  },
+  deleteCandidateAndTrial: (candidateId: number) => {
+    return ipcRenderer.invoke('candidate/trial::delete', candidateId)
+  },
+  deleteManually: (candidateId: number) => {
+    return ipcRenderer.invoke('candidate/trial::deleteManually', candidateId)
   },
   updateSettings: (settings: AppSettings) => {
     return ipcRenderer.invoke('settings::updateSetting', settings)
   },
+  getSettings: () => {
+    return ipcRenderer.invoke('settings::getSetting')
+  },
   updateLanguage: (language: Languages) => {
     return ipcRenderer.invoke('settings::updateLaguage', language)
-  },
-  getTrailByCandidateId: (candidateId: number) => {
-    return ipcRenderer.invoke('trail::getByCandidateId', candidateId)
-  },
-  updateTrail: (trail: TrailRow) => {
-    return ipcRenderer.invoke('trail::updateTrail', trail)
-  },
-  deleteCandidateAndTrail: (candidateId: number) => {
-    return ipcRenderer.invoke('candidate/trail::delete', candidateId)
-  },
-  deleteManually: (candidateId: number) => {
-    return ipcRenderer.invoke('candidate/trail::deleteManually', candidateId)
   }
 }
 

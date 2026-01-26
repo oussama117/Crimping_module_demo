@@ -18,7 +18,7 @@ import { useAppSettingsStore } from '@renderer/store/useAppSettingStore'
 import { Languages } from '@/types'
 import apis from '../api/api'
 import { useCandidateStore } from '@renderer/store/useCandidateStore'
-import { useTrailStore } from '@renderer/store/useTrailStore'
+import { useTrialStore } from '@/renderer/src/store/useTrialStore'
 import { toast } from 'sonner'
 
 export default function RegistrationPage(): React.JSX.Element {
@@ -30,7 +30,7 @@ export default function RegistrationPage(): React.JSX.Element {
   const navigate = useNavigate()
   const { settings, setAppSettings, loadAppSettings } = useAppSettingsStore()
   const { setCandidate } = useCandidateStore()
-  const { setTrail } = useTrailStore()
+  const { setTrial } = useTrialStore()
 
   useEffect(() => {
     loadAppSettings()
@@ -77,7 +77,9 @@ export default function RegistrationPage(): React.JSX.Element {
               <img className="h-full" src={yazaki_logo} alt="yazaki logo" />
             </div>
             <div className="flex-1 p-6 border-l border-gray-400 flex items-center justify-center">
-              <label className="text-5xl font-black m-auto">{t('registration_page.title')} 6</label>
+              <label className="text-5xl font-black m-auto">
+                {t('registration_page.title')} {settings.module_number}
+              </label>
             </div>
           </div>
           {/* content */}
@@ -149,13 +151,13 @@ export default function RegistrationPage(): React.JSX.Element {
                     .then((candidate) => {
                       setCandidate({ ...candidate })
                       if (candidate.id != null) {
-                        apis.getTrailByCandidateId(candidate.id).then((trail) => {
-                          setTrail({ ...trail })
+                        apis.getTrialByCandidateId(candidate.id).then((trial) => {
+                          setTrial({ ...trial })
                         })
                       }
                     })
                     .finally(() => {
-                      navigate('/trail')
+                      navigate('/trial')
                     })
                 }}
               >
@@ -185,7 +187,7 @@ export default function RegistrationPage(): React.JSX.Element {
             </div>
           </div>
         </section>
-        <div className="absolute bottom-6 left-6 text-black">
+        <div className="absolute top-6 right-6">
           <Select
             onValueChange={(value) => {
               setAppSettings({
@@ -216,7 +218,7 @@ export default function RegistrationPage(): React.JSX.Element {
             }}
             value={settings.language || Languages.fr}
           >
-            <SelectTrigger className="w-[120px] bg-white border border-gray-400 shadow-lg">
+            <SelectTrigger className="w-[120px] bg-black text-white shadow-lg">
               <SelectValue placeholder="Language" />
             </SelectTrigger>
             <SelectContent className="bg-white">
@@ -225,6 +227,12 @@ export default function RegistrationPage(): React.JSX.Element {
               <SelectItem value="ar">العربية 'ar'</SelectItem>
             </SelectContent>
           </Select>
+        </div>
+        <div className="w-[100%] px-4 absolute bottom-4 flex justify-between">
+          <label className="text-gray-600 text-sm">Version: 1.0.1</label>
+          <label className="text-gray-600 text-sm">
+            This app & embedded system is developed by YERMANI Oussama
+          </label>
         </div>
       </div>
     </>

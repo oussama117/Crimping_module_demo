@@ -4,6 +4,7 @@ import {
   ArrowBigLeft,
   CircleX,
   Clock,
+  Hash,
   Info,
   LanguagesIcon,
   RefreshCcwDot,
@@ -34,13 +35,14 @@ import {
   DialogHeader,
   DialogTitle
 } from '@renderer/components/ui/dialog'
+import { Separator } from '@renderer/components/ui/separator'
 
 export default function Settings(): React.JSX.Element {
   const { t } = useTranslation()
   const navigate = useNavigate()
   // const location = useLocation()
   // const origin = location.state?.from || 'direct-access'
-  console.log('User came from:', origin)
+  // console.log('User came from:', origin)
   const { settings, setAppSettings } = useAppSettingsStore()
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false)
 
@@ -53,7 +55,7 @@ export default function Settings(): React.JSX.Element {
 
   return (
     <>
-      <section className="w-full h-screen flex flex-col">
+      <section className="relative w-full h-screen flex flex-col">
         <Dialog open={openConfirmDialog} onOpenChange={setOpenConfirmDialog}>
           <DialogContent className="p-0 z-[101] h-[250px] w-[400px] min-w-[400px] overflow-hidden">
             <DialogHeader className="hidden">
@@ -82,7 +84,9 @@ export default function Settings(): React.JSX.Element {
                   className="cursor-pointer"
                   onClick={() => {
                     apis.updateSettings({ ...settings }).then((data) => {
-                      // console.log('setting update result: ', data)
+                      console.log('setting update result: ', data)
+                      console.log('setting update obj: ', settings)
+
                       if (data.success) {
                         setOpenConfirmDialog(false)
                       } else {
@@ -107,7 +111,7 @@ export default function Settings(): React.JSX.Element {
               }}
             >
               <ArrowBigLeft />
-              <Label className="cursor-pointer">{t('trail_page.return_button')}</Label>
+              <Label className="cursor-pointer">{t('trial_page.return_button')}</Label>
             </Button>
           </div>
           <div className="h-full flex-1 flex items-center justify-center gap-4">
@@ -116,12 +120,12 @@ export default function Settings(): React.JSX.Element {
               <label
                 className={`bg-black text-white font-bold px-[10px] py-[5px] ${settings.language === Languages.ar ? 'rounded-e-md' : 'rounded-s-md'}`}
               >
-                {t('trail_page.title')}
+                {t('trial_page.title')}
               </label>
               <label
                 className={`bg-red-600 text-white font-bold px-4 py-2 px-[10px] py-[5px] ${settings.language === Languages.ar ? 'rounded-s-md' : 'rounded-e-md'} `}
               >
-                6
+                {settings.module_number}
               </label>
             </div>
           </div>
@@ -147,7 +151,7 @@ export default function Settings(): React.JSX.Element {
                       {t('settings_page.language_setting')}
                     </label>
                     <p className="text-xs text-gray-400">
-                      {t('settings_page.trial_time_setting_info')}
+                      {t('settings_page.language_setting_info')}
                     </p>
                   </div>
                 </div>
@@ -201,12 +205,53 @@ export default function Settings(): React.JSX.Element {
                         {t('settings_page.language_setting')}
                       </label>
                       <p className="text-xs text-gray-400">
-                        {t('settings_page.trial_time_setting_info')}
+                        {t('settings_page.language_setting_info')}
                       </p>
                     </div>
                     <LanguagesIcon />
                   </div>
                 </>
+              ) : (
+                ''
+              )}
+            </div>
+            <div className="w-full flex items-center justify-between bg-white p-4 rounded-xl border border-gray-400 shadow-md">
+              {settings.language != Languages.ar ? (
+                <div className="flex gap-2 items-center">
+                  <Hash />
+                  <div className={`w-max flex flex-col`}>
+                    <label className="text-lg font-bold w-max">
+                      {t('settings_page.module_number_setting')}
+                    </label>
+                    <p className={`text-xs text-gray-400 w-max`}>
+                      {t('settings_page.module_number_setting_info')}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                ''
+              )}
+              <Input
+                type="number"
+                className="w-[20%]"
+                placeholder={t('settings_page.module_number_placeholder')}
+                onChange={(e) => {
+                  const val = e.target.value === '' ? null : Number(e.target.value)
+                  setAppSettings({ ...settings, module_number: val })
+                }}
+              ></Input>
+              {settings.language === Languages.ar ? (
+                <div className="flex gap-2 items-center">
+                  <div className={`w-max flex flex-col items-end`}>
+                    <label className="text-lg font-bold w-max">
+                      {t('settings_page.module_number_setting')}
+                    </label>
+                    <p className={`text-xs text-gray-400 w-max`}>
+                      {t('settings_page.module_number_setting_info')}
+                    </p>
+                  </div>
+                  <Hash />
+                </div>
               ) : (
                 ''
               )}
@@ -233,7 +278,7 @@ export default function Settings(): React.JSX.Element {
                 placeholder={t('settings_page.trial_time_placeholder')}
                 onChange={(e) => {
                   const val = e.target.value === '' ? null : Number(e.target.value)
-                  setAppSettings({ ...settings, trail_time: val })
+                  setAppSettings({ ...settings, trial_time: val })
                 }}
               ></Input>
               {settings.language === Languages.ar ? (
@@ -368,39 +413,110 @@ export default function Settings(): React.JSX.Element {
               )}
             </div>
           </div>
-          <div className="flex-1 h-full p-4">
-            <ul className={`mt-[75px] ${settings.language === Languages.ar ? 'text-right' : ''}`}>
-              <li className="py-2 px-6 text-lg text-gray-600">
-                <span className={`font-bold ${settings.language === Languages.ar ? '' : 'hidden'}`}>
-                  {settings.language}
-                </span>
-                {t('settings_page.language_setting')}
-                <span className={`font-bold ${settings.language != Languages.ar ? '' : 'hidden'}`}>
-                  {settings.language}
-                </span>
-              </li>
-              <li className="py-2 px-6 text-lg text-gray-600">
-                {t('settings_page.trial_time_setting')}:{' '}
-                <span className="font-bold">{settings.trail_time}</span>
-              </li>
-              <li className="py-2 px-6 text-lg text-gray-600">
+          <div className="flex-1 h-full py-4 px-8">
+            <div className="text-2xl font-bold py-4">
+              <label>{t('settings_page.init_settings')}</label>
+            </div>
+            <Separator />
+            <div className="flex items-center justify-between p-4 text-md text-gray-600">
+              <label className={`font-bold ${settings.language === Languages.ar ? '' : 'hidden'}`}>
+                {settings.language === Languages.ar
+                  ? "'ar' العربية"
+                  : settings.language === Languages.en
+                    ? "English 'en'"
+                    : "Français 'fr'"}
+              </label>
+              <label className="text-md text-gray-600">{t('settings_page.language_setting')}</label>
+              <label className={`font-bold ${settings.language === Languages.ar ? 'hidden' : ''}`}>
+                {settings.language === Languages.ar
+                  ? "'ar' العربية"
+                  : settings.language === Languages.en
+                    ? "English 'en'"
+                    : "Français 'fr'"}
+              </label>
+            </div>
+            <Separator />
+            <div className="flex items-center justify-between p-4 text-md text-gray-600">
+              <label className={`font-bold ${settings.language === Languages.ar ? '' : 'hidden'}`}>
+                {settings.module_number}
+              </label>
+              <label className="text-md text-gray-600">
+                {t('settings_page.module_number_setting')}
+              </label>
+              <label className={`font-bold ${settings.language === Languages.ar ? 'hidden' : ''}`}>
+                {settings.module_number}
+              </label>
+            </div>
+            <Separator />
+            <div className="flex items-center justify-between p-4 text-md text-gray-600">
+              <label className={`font-bold ${settings.language === Languages.ar ? '' : 'hidden'}`}>
+                {settings.trial_time}
+              </label>
+              <label className="text-md text-gray-600">
+                {t('settings_page.trial_time_setting')}
+              </label>
+              <label className={`font-bold ${settings.language === Languages.ar ? 'hidden' : ''}`}>
+                {settings.trial_time}
+              </label>
+            </div>
+            <Separator />
+            <div className="text-md text-gray-600">
+              <label
+                className={`flex w-full p-2 font-bold ${settings.language === Languages.ar ? 'justify-end' : ''}`}
+              >
                 {t('settings_page.levels_title')}
-                <ul>
-                  <li className="py-2 px-6 text-lg text-gray-600">
-                    {t('settings_page.level_1_setting')}:{' '}
-                    <span className="font-bold">{settings.level_1}</span>
-                  </li>
-                  <li className="py-2 px-6 text-lg text-gray-600">
-                    {t('settings_page.level_2_setting')}:{' '}
-                    <span className="font-bold">{settings.level_2}</span>
-                  </li>
-                  <li className="py-2 px-6 text-lg text-gray-600">
-                    {t('settings_page.level_3_setting')}:{' '}
-                    <span className="font-bold">{settings.level_3}</span>
-                  </li>
-                </ul>{' '}
-              </li>
-            </ul>
+              </label>
+              <div className="px-4">
+                <div className="flex items-center text-md justify-between p-4">
+                  <label
+                    className={`font-bold ${settings.language === Languages.ar ? '' : 'hidden'}`}
+                  >
+                    {settings.level_1}
+                  </label>
+                  <label className="text-md text-gray-600">
+                    {t('settings_page.level_1_setting')}
+                  </label>
+                  <label
+                    className={`font-bold ${settings.language === Languages.ar ? 'hidden' : ''}`}
+                  >
+                    {settings.level_1}
+                  </label>
+                </div>
+                <Separator />
+                <div className="flex items-center text-md justify-between p-4">
+                  <label
+                    className={`font-bold ${settings.language === Languages.ar ? '' : 'hidden'}`}
+                  >
+                    {settings.level_2}
+                  </label>
+                  <label className="text-md text-gray-600">
+                    {t('settings_page.level_2_setting')}
+                  </label>
+                  <label
+                    className={`font-bold ${settings.language === Languages.ar ? 'hidden' : ''}`}
+                  >
+                    {settings.level_2}
+                  </label>
+                </div>
+                <Separator />
+                <div className="flex items-center text-md justify-between p-4">
+                  <label
+                    className={`font-bold ${settings.language === Languages.ar ? '' : 'hidden'}`}
+                  >
+                    {settings.level_3}
+                  </label>
+                  <label className="text-md text-gray-600">
+                    {t('settings_page.level_3_setting')}
+                  </label>
+                  <label
+                    className={`font-bold ${settings.language === Languages.ar ? 'hidden' : ''}`}
+                  >
+                    {settings.level_3}
+                  </label>
+                </div>
+                <Separator />
+              </div>{' '}
+            </div>
           </div>
         </div>
         <div className="w-[50%] mx-auto flex gap-2 justify-end py-6">
@@ -409,10 +525,11 @@ export default function Settings(): React.JSX.Element {
             onClick={() => {
               setAppSettings({
                 ...settings,
-                trail_time: 60,
+                trial_time: 60,
                 level_1: 60,
                 level_2: 90,
-                level_3: 110
+                level_3: 110,
+                module_number: 6
               })
             }}
             className="cursor-pointer"
@@ -430,6 +547,15 @@ export default function Settings(): React.JSX.Element {
             <Save />
             <label className="cursor-pointer">{t('settings_page.save_button')}</label>
           </Button>
+        </div>
+        <div className="absolute bottom-4 left-4 flex gap-2 flex-col text-sm text-gray-600">
+          <label>Version: 1.0.1</label>
+          <label>Developer info:</label>
+          <div className="flex flex-col px-2">
+            <label>YERMANI Oussama</label>
+            <label>oussamayer117@gmail.com</label>
+            <label>28063306</label>
+          </div>
         </div>
       </section>
     </>

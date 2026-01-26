@@ -5,8 +5,8 @@ import { useNavigate } from 'react-router-dom'
 import yazakiLogo from '../../assets/logo.png'
 import { useEffect, useState } from 'react'
 import { useCandidateStore } from '@renderer/store/useCandidateStore'
-import { CandidateRow, Classifications, Languages, Levels, Results, TrailRow } from '@/types'
-import { useTrailStore } from '@renderer/store/useTrailStore'
+import { CandidateRow, Classifications, Languages, Levels, Results, TrialRow } from '@/types'
+import { useTrialStore } from '@/renderer/src/store/useTrialStore'
 import { useAppSettingsStore } from '@renderer/store/useAppSettingStore'
 import { useTranslation } from 'react-i18next'
 import {
@@ -19,7 +19,7 @@ import {
 import apis from '../api/api'
 import trailBg from '../../assets/trail_bg.png'
 
-export default function Trail(): React.JSX.Element {
+export default function Trial(): React.JSX.Element {
   // DECLARATIONS
 
   const { t } = useTranslation()
@@ -33,22 +33,22 @@ export default function Trail(): React.JSX.Element {
   const scale = 1.25 // Scale factor for the center item
   const font_size = 60 // Scale factor for the center item
   const { candidate, setCandidate } = useCandidateStore()
-  const { trail, setTrail } = useTrailStore()
+  const { trial, setTrial } = useTrialStore()
   const { settings } = useAppSettingsStore()
   const numbers = Array.from({ length: settings.level_3 ? settings.level_3 + 1 : 111 }, (_, i) => i)
 
   const [countdown, setCountdown] = useState(5)
-  const [seconds, setSeconds] = useState(settings.trail_time ? settings.trail_time : 60)
+  const [seconds, setSeconds] = useState(settings.trial_time ? settings.trial_time : 60)
   const [isCountdownActive, setisCountdownActive] = useState(false)
   const [isActive, setIsActive] = useState(false)
   const [openDialog, setOpenDialog] = useState(false)
-  const [trailResults, setTrailResults] = useState<Partial<TrailRow>>()
+  const [trialResults, settrialResults] = useState<Partial<TrialRow>>()
   // const [arduinoData, setArduinoData] = useState<any>()
 
   const strokeWidth = 20 // Adjust thickness here
   const radius = 190 - strokeWidth
   const circumference = 2 * Math.PI * radius
-  const progress = seconds / (settings.trail_time || 60)
+  const progress = seconds / (settings.trial_time || 60)
   const dashOffset = circumference - progress * circumference
   const svgCentre = (itemWidth * 3) / 2
 
@@ -80,8 +80,8 @@ export default function Trail(): React.JSX.Element {
     setCountdown(5)
     setIsActive(false)
     setisCountdownActive(false)
-    if (settings.trail_time) {
-      setSeconds(settings.trail_time)
+    if (settings.trial_time) {
+      setSeconds(settings.trial_time)
     }
   }
 
@@ -113,7 +113,7 @@ export default function Trail(): React.JSX.Element {
     return () => {
       if (interval) clearInterval(interval)
     }
-  }, [isCountdownActive, settings.trail_time])
+  }, [isCountdownActive, settings.trial_time])
 
   useEffect(() => {
     let interval: NodeJS.Timeout
@@ -133,7 +133,7 @@ export default function Trail(): React.JSX.Element {
     return () => {
       if (interval) clearInterval(interval)
     }
-  }, [isActive, settings.trail_time])
+  }, [isActive, settings.trial_time])
 
   useEffect(() => {
     const l1 = settings.level_1 != null && currentIndex >= settings.level_1
@@ -150,15 +150,16 @@ export default function Trail(): React.JSX.Element {
 
     // If neither condition is met, do nothing and wait
     if (openDialog === true) return
-    if (seconds === settings.trail_time) return
+    if (seconds === settings.trial_time) return
     if (!isTimeOut && !isWorkFinished) return
     // if (!isActive) return
     // console.log('numbers.length: ', numbers.length)
+    if (currentIndex === numbers.length - 1 && seconds > 0) setIsActive(false)
 
-    let trailLevel = Levels.level_init
-    if (l3) trailLevel = Levels.level_3
-    else if (l2) trailLevel = Levels.level_2
-    else if (l1) trailLevel = Levels.level_1
+    let trialLevel = Levels.level_init
+    if (l3) trialLevel = Levels.level_3
+    else if (l2) trialLevel = Levels.level_2
+    else if (l1) trialLevel = Levels.level_1
 
     const classMap = {
       [Levels.level_1]: Classifications.beginner,
@@ -167,24 +168,30 @@ export default function Trail(): React.JSX.Element {
       [Levels.level_init]: Classifications.class_init
     }
 
-    const trailClass = classMap[trailLevel as keyof typeof classMap]
+    const trialClass = classMap[trialLevel as keyof typeof classMap]
 
-    const trailResult = trailLevel !== Levels.level_init ? Results.success : Results.failure
+    const trialResult = trialLevel !== Levels.level_init ? Results.success : Results.failure
 
-    const trailInstance: Partial<TrailRow> = {
-      id: trail.id,
-      candidate_id: trail.candidate_id,
+    const trialRemainingTime =
+      currentIndex === numbers.length - 1 && seconds > 0 && settings.trial_time
+        ? settings.trial_time - seconds
+        : 0
+
+    const trialInstance: Partial<TrialRow> = {
+      id: trial.id,
+      candidate_id: trial.candidate_id,
       turns_m: currentIndex,
-      level: trailLevel,
-      result: trailResult,
-      class: trailClass
+      remaining_time: trialRemainingTime,
+      level: trialLevel,
+      result: trialResult,
+      class: trialClass
     }
 
-    setTrailResults(trailInstance)
-    console.log('trial: ', trailInstance)
-    setTrail({ ...trailInstance } as TrailRow)
-    apis.updateTrail({ ...trailInstance } as TrailRow).then((data) => {
-      console.log('trail save: ', data)
+    settrialResults(trialInstance)
+    // console.log('trialInstance: ', trialInstance)
+    setTrial({ ...trialInstance } as TrialRow)
+    apis.updateTrial({ ...trialInstance } as TrialRow).then((data) => {
+      // console.log('trial save: ', data)
       if (!data.success) {
         // console.error('error updating ')
         alert(`error updating err: ${data.error}`)
@@ -192,7 +199,7 @@ export default function Trail(): React.JSX.Element {
     })
 
     setOpenDialog(true)
-    // console.log('Trail complete:', trailInstance)
+    // console.log('Trail complete:', trialInstance)
   }, [seconds, level_1, level_2, level_3, currentIndex])
 
   useEffect(() => {
@@ -220,10 +227,10 @@ export default function Trail(): React.JSX.Element {
               <div className="relative w-[300px] bg-gray-600 flex flex-col gap-4 items-center justify-center p-4 overflow-hidden text-white">
                 <ClockCheck className="z-[1] min-w-[80px] min-h-[80px]" />
                 <label className="z-[1] text-5xl font-black text-center">
-                  {t('trail_page.end_time')}
+                  {t('trial_page.end_time')}
                 </label>
                 <label className={`text-xl text-center z-[1] `}>
-                  {t(`trail_page.result.${trailResults?.result}`)}
+                  {t(`trial_page.result.${trialResults?.result}`)}
                 </label>
                 <img
                   src={trailBg}
@@ -233,53 +240,53 @@ export default function Trail(): React.JSX.Element {
               </div>
               <div className="flex-1 flex flex-col items-center justify-between">
                 <label className="mt-[20px] text-xl font-bold">
-                  {t('trail_page.dialog_title')}
+                  {t('trial_page.dialog_title')}
                 </label>
                 <div className=" flex flex-col gap-2 items-center px-4">
                   <label className="text-center text-[40px] font-black">
-                    {t(`trail_page.${trailResults?.level}`)}
+                    {t(`trial_page.${trialResults?.level}`)}
                   </label>
                   <div className="flex w-max leading-none">
                     <label className="text-center text-[120px] font-black">
-                      {trailResults?.turns_m}
-                      <span className="text-[40px] font-bold">{t('trail_page.turn')}</span>
+                      {trialResults?.turns_m}
+                      <span className="text-[40px] font-bold">{t('trial_page.turn')}</span>
                     </label>
                     <label className="text-center text-[120px] text-gray-600">/</label>
                     <label className="text-center text-[120px] font-black text-gray-600">
-                      {settings.trail_time}
+                      {settings.trial_time}
                       <span className="text-[40px] font-bold text-gray-600">
-                        {t('trail_page.second')}
+                        {t('trial_page.second')}
                       </span>
                     </label>
                   </div>
                   <div className="flex items-center gap-2 justify-center">
                     <div
                       className={`h-[20px] w-[20px] rounded-full ${
-                        trailResults?.level === Levels.level_1
+                        trialResults?.level === Levels.level_1
                           ? 'bg-yellow-400'
-                          : trailResults?.level === Levels.level_2
+                          : trialResults?.level === Levels.level_2
                             ? 'bg-orange-400'
-                            : trailResults?.level === Levels.level_3
+                            : trialResults?.level === Levels.level_3
                               ? 'bg-green-400'
                               : 'bg-black'
                       }`}
                     ></div>
                     <label className="text-center text-[40px] font-black">
-                      {t(`trail_page.class.${trailResults?.class}`)}
+                      {t(`trial_page.class.${trialResults?.class}`)}
                     </label>
                   </div>
                   <div className="flex flex-col items-center justify-center">
-                    {trailResults?.result === Results.failure ? (
-                      <label className="text-lg text-center">{t(`trail_page.line.failed`)}</label>
+                    {trialResults?.result === Results.failure ? (
+                      <label className="text-lg text-center">{t(`trial_page.line.failed`)}</label>
                     ) : (
                       <label className="text-lg text-center">
-                        {t(`trail_page.line.${trailResults?.class}`)}
+                        {t(`trial_page.line.${trialResults?.class}`)}
                       </label>
                     )}
-                    {trailResults?.result === Results.failure ? (
-                      <p className="text-center text-gray-600">{t('trail_page.failed_p')}</p>
+                    {trialResults?.result === Results.failure ? (
+                      <p className="text-center text-gray-600">{t('trial_page.failed_p')}</p>
                     ) : (
-                      <p className="text-center text-gray-600">{t('trail_page.success_p')}</p>
+                      <p className="text-center text-gray-600">{t('trial_page.success_p')}</p>
                     )}
                   </div>
                 </div>
@@ -294,7 +301,7 @@ export default function Trail(): React.JSX.Element {
                     >
                       <RotateCcw className="min-w-[20px] min-h-[20px]" />
                       <label className="text-lg font-bold cursor-pointer text-white">
-                        {t('trail_page.try_again_button')}
+                        {t('trial_page.try_again_button')}
                       </label>
                     </Button>
                     <Button
@@ -307,7 +314,7 @@ export default function Trail(): React.JSX.Element {
                     >
                       <ArrowBigLeft className="min-w-[20px] min-h-[20px]" />
                       <label className="text-lg font-bold cursor-pointer text-white">
-                        {t('trail_page.exit_button')}
+                        {t('trial_page.exit_button')}
                       </label>
                     </Button>
                   </div>
@@ -327,10 +334,11 @@ export default function Trail(): React.JSX.Element {
                   candidate_name: null,
                   serial_number: null
                 } as CandidateRow)
-                setTrail({
+                setTrial({
                   id: null,
                   candidate_id: null,
                   turns_m: null,
+                  remaining_time: null,
                   result: null,
                   level: null,
                   class: null
@@ -339,14 +347,14 @@ export default function Trail(): React.JSX.Element {
               }}
             >
               <ArrowBigLeft />
-              <Label className="cursor-pointer">{t('trail_page.return_button')}</Label>
+              <Label className="cursor-pointer">{t('trial_page.return_button')}</Label>
             </Button>
             <Button
               className="cursor-pointer hover:bg-gray-400 hover:text-white flex flex-col items-center justify-center bg-transparent text-gray-600 h-full w-[140px] rounded-none"
               onClick={() => handelReset()}
             >
               <RotateCcw />
-              <Label className="cursor-pointer">{t('trail_page.reset_button')}</Label>
+              <Label className="cursor-pointer">{t('trial_page.reset_button')}</Label>
             </Button>
             <Button
               className="cursor-pointer hover:bg-gray-400 hover:text-white flex flex-col items-center justify-center bg-transparent text-gray-600 h-full w-[140px] rounded-none"
@@ -355,7 +363,7 @@ export default function Trail(): React.JSX.Element {
               }}
             >
               <Cog />
-              <Label className="cursor-pointer">{t('trail_page.settings_button')}</Label>
+              <Label className="cursor-pointer">{t('trial_page.settings_button')}</Label>
             </Button>
           </div>
           <div className="h-full flex-1 flex items-center justify-center gap-4">
@@ -364,12 +372,12 @@ export default function Trail(): React.JSX.Element {
               <label
                 className={`bg-black text-white font-bold px-[10px] py-[5px] ${settings.language === Languages.ar ? 'rounded-e-md' : 'rounded-s-md'}`}
               >
-                {t('trail_page.title')}
+                {t('trial_page.title')}
               </label>
               <label
                 className={`bg-red-600 text-white font-bold px-4 py-2 px-[10px] py-[5px] ${settings.language === Languages.ar ? 'rounded-s-md' : 'rounded-e-md'} `}
               >
-                6
+                {settings.module_number}
               </label>
             </div>
           </div>
@@ -390,19 +398,19 @@ export default function Trail(): React.JSX.Element {
             <div className="flex w-max h-max items-end">
               {settings.language === Languages.ar ? (
                 <>
-                  <label className="text-[40px] font-black">{t('trail_page.second')}</label>
+                  <label className="text-[40px] font-black">{t('trial_page.second')}</label>
                   <label className="text-[50px] font-black">{seconds + ' :'}</label>
                 </>
               ) : (
                 ''
               )}
-              <label className=" text-[50px] font-black">{t('trail_page.time')}</label>
+              <label className=" text-[50px] font-black">{t('trial_page.time')}</label>
               {settings.language === Languages.ar ? (
                 ''
               ) : (
                 <>
                   <label className="text-[50px] font-black">{': ' + seconds}</label>
-                  <label className="text-[40px] font-black">{t('trail_page.second')}</label>
+                  <label className="text-[40px] font-black">{t('trial_page.second')}</label>
                 </>
               )}
             </div>
@@ -498,7 +506,7 @@ export default function Trail(): React.JSX.Element {
                 }
               }}
             >
-              {isActive ? t('trail_page.pause_button') : t('trail_page.start_button')}
+              {isActive ? t('trial_page.pause_button') : t('trial_page.start_button')}
               {isActive ? (
                 <Pause className="min-h-[30px] min-w-[30px]" />
               ) : (
@@ -557,38 +565,50 @@ export default function Trail(): React.JSX.Element {
             </div>
             <div className="relative w-[20px] h-[20px] box-content border-6 border-white bg-black rounded-full">
               <label className="absolute left-1/2 -translate-x-1/2 top-[-30px] text-[16px] font-bold whitespace-nowrap">
-                {t('trail_page.start_point')}
+                {t('trial_page.start_point')}
               </label>
             </div>
             <div
-              className={`relative w-[20px] h-[20px] box-content border-6 border-white ${level_1 ? 'bg-green-600 animate-bounce' : 'bg-green-200'}  rounded-full`}
+              className={`relative w-[20px] h-[20px] box-content border-6 border-white bg-white rounded-full `}
             >
-              <label className="absolute left-1/2 -translate-x-1/2 top-[-30px] text-[16px] font-bold whitespace-nowrap">
-                {t('trail_page.level_1')}
-              </label>
-              <label className="absolute left-1/2 -translate-x-1/2 bottom-[-30px] text-[16px] font-bold whitespace-nowrap">
-                {settings.level_1}
-              </label>
+              <div
+                className={`relative w-full h-full rounded-full ${level_1 ? 'bg-green-600 animate-bounce' : 'bg-green-200'}`}
+              >
+                <label className="absolute left-1/2 -translate-x-1/2 top-[-30px] text-[16px] font-bold whitespace-nowrap">
+                  {t('trial_page.level_1')}
+                </label>
+                <label className="absolute left-1/2 -translate-x-1/2 bottom-[-30px] text-[16px] font-bold whitespace-nowrap">
+                  {settings.level_1}
+                </label>
+              </div>
             </div>
             <div
-              className={`relative w-[20px] h-[20px] box-content border-6 border-white ${level_2 ? 'bg-green-600 animate-bounce' : 'bg-green-200'} rounded-full`}
+              className={`relative w-[20px] h-[20px] box-content border-6 border-white bg-white rounded-full`}
             >
-              <label className="absolute left-1/2 -translate-x-1/2 top-[-30px] text-[16px] font-bold whitespace-nowrap">
-                {t('trail_page.level_2')}
-              </label>
-              <label className="absolute left-1/2 -translate-x-1/2 bottom-[-30px] text-[16px] font-bold whitespace-nowrap">
-                {settings.level_2}
-              </label>
+              <div
+                className={`relative w-full h-full rounded-full ${level_2 ? 'bg-green-600 animate-bounce' : 'bg-green-200'}`}
+              >
+                <label className="absolute left-1/2 -translate-x-1/2 top-[-30px] text-[16px] font-bold whitespace-nowrap">
+                  {t('trial_page.level_2')}
+                </label>
+                <label className="absolute left-1/2 -translate-x-1/2 bottom-[-30px] text-[16px] font-bold whitespace-nowrap">
+                  {settings.level_2}
+                </label>
+              </div>
             </div>
             <div
-              className={`relative w-[20px] h-[20px] box-content border-6 border-white ${level_3 ? 'bg-green-600 animate-bounce' : 'bg-green-200'} rounded-full`}
+              className={`relative w-[20px] h-[20px] box-content border-6 border-white bg-white rounded-full`}
             >
-              <label className="absolute left-1/2 -translate-x-1/2 top-[-30px] text-[16px] font-bold whitespace-nowrap">
-                {t('trail_page.level_3')}
-              </label>
-              <label className="absolute left-1/2 -translate-x-1/2 bottom-[-30px] text-[16px] font-bold whitespace-nowrap">
-                {settings.level_3}
-              </label>
+              <div
+                className={`relative w-full h-full rounded-full ${level_3 ? 'bg-green-600 animate-bounce' : 'bg-green-200'}`}
+              >
+                <label className="absolute left-1/2 -translate-x-1/2 top-[-30px] text-[16px] font-bold whitespace-nowrap">
+                  {t('trial_page.level_3')}
+                </label>
+                <label className="absolute left-1/2 -translate-x-1/2 bottom-[-30px] text-[16px] font-bold whitespace-nowrap">
+                  {settings.level_3}
+                </label>
+              </div>
             </div>
           </div>
           {/* <Button className="absolute top-[30px] left-[30px]" onClick={handleScroll}>
@@ -600,7 +620,7 @@ export default function Trail(): React.JSX.Element {
         </div>
         {isCountdownActive && countdown != 0 ? (
           <div className="z-[200] absolute h-full w-full bg-[#ffffffb8] flex flex-col items-center justify-center">
-            <label className="text-black font-black text-[50px]">{t('trail_page.countdown')}</label>
+            <label className="text-black font-black text-[50px]">{t('trial_page.countdown')}</label>
             <label className="text-green-600 font-black text-[100px]">{countdown}</label>
           </div>
         ) : (

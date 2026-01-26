@@ -4,8 +4,8 @@ import path from 'path'
 import fs from 'fs'
 import { __SCHEMA } from './schema/schema'
 import {
-  TrailJoinCandidate,
-  TrailRow,
+  TrialJoinCandidate,
+  TrialRow,
   CandidateRow,
   ReturnCandidateDTO,
   AppSettings,
@@ -38,23 +38,23 @@ class AppDatabase {
     try {
       // .exec handles the entire multi-line schema (Table + Trigger)
       this.db.exec(__SCHEMA)
-      console.log('Trail table and triggers initialized.')
+      console.log('Trial table and triggers initialized.')
     } catch (err) {
       console.error('Schema initialization failed:', err)
     }
   }
 
-  public getAllTrailJoinCandidate(): TrailJoinCandidate[] {
+  public getAllTrialJoinCandidate(): TrialJoinCandidate[] {
     try {
       const sql = `
       SELECT 
         t.id as t_id, 
         t.candidate_id as t_candidate_id, 
-        t.turns_m, t.result, t.level, t.class, 
+        t.turns_m, t.remaining_time, t.result, t.level, t.class, 
         t.created_at as t_created, t.updated_at as t_updated,
         c.id as c_id, c.candidate_name, c.serial_number, 
         c.created_at as c_created, c.updated_at as c_updated
-      FROM trail t
+      FROM trial t
       LEFT JOIN candidate c ON t.candidate_id = c.id
       ORDER BY t.created_at DESC
     `
@@ -62,13 +62,14 @@ class AppDatabase {
       const stmt = this.db.prepare(sql)
 
       // We cast to 'any' initially because the SQL result is a flat object,
-      // not the nested TrailJoinCandidate interface yet.
+      // not the nested TrialJoinCandidate interface yet.
       const rows = stmt.all() as any[]
 
       return rows.map((row) => ({
         id: row.t_id,
         candidateId: row.t_candidate_id, // Fix: Use candidate_id, not t_id
         turns_m: row.turns_m,
+        remaining_time: row.remaining_time,
         result: row.result,
         level: row.level,
         class: row.class,
@@ -86,7 +87,7 @@ class AppDatabase {
           : null
       }))
     } catch (error) {
-      console.error('SQL Error in getAllTrailJoinCandidate:', error)
+      console.error('SQL Error in getAllTrialJoinCandidate:', error)
       return []
     }
   }
@@ -157,14 +158,14 @@ class AppDatabase {
         throw new Error('Failed to create candidate: No data returned')
       }
 
-      const trailStmt = this.db.prepare(`
-      INSERT INTO trail ( candidate_id, turns_m, result, level, class )
-      VALUES (?, ?, ?, ?, ?)
+      const trialStmt = this.db.prepare(`
+      INSERT INTO trial ( candidate_id, turns_m, remaining_time, result, level, class )
+      VALUES (?, ?, ?, ?, ?, ?)
       RETURNING *
     `)
-      const newTrail = trailStmt.get(newCandidate.id, -1, 'init', 'level_init', 'class_init')
-      if (!newTrail) {
-        throw new Error('Failed to create trail: No data returned')
+      const newTrial = trialStmt.get(newCandidate.id, -1, 0, 'init', 'level_init', 'class_init')
+      if (!newTrial) {
+        throw new Error('Failed to create trial: No data returned')
       }
       return newCandidate
     } catch (err) {
@@ -174,7 +175,7 @@ class AppDatabase {
     }
   }
 
-  public deleteCandidateAndTrail(candidateId: number): { success: boolean; error: any } {
+  public deleteCandidateAndTrial(candidateId: number): { success: boolean; error: any } {
     try {
       const stmt = this.db.prepare('DELETE FROM candidate WHERE id = ?')
       const result = stmt.run(candidateId)
@@ -193,7 +194,7 @@ class AppDatabase {
   public deleteManually(candidateId: number): { success: boolean; error: any } {
     const deleteTransaction = this.db.transaction((id: number) => {
       // 1. Delete associated trails first
-      this.db.prepare('DELETE FROM trail WHERE candidate_id = ?').run(id)
+      this.db.prepare('DELETE FROM trial WHERE candidate_id = ?').run(id)
 
       // 2. Then delete the candidate
       const result = this.db.prepare('DELETE FROM candidate WHERE id = ?').run(id)
@@ -209,29 +210,40 @@ class AppDatabase {
     }
   }
 
-  public getTrailByCandidateId(candidateId: number): TrailRow {
+  public getTrialByCandidateId(candidateId: number): TrialRow {
     return this.db
-      .prepare(`SELECT * FROM trail WHERE candidate_id = ?`)
-      .get(candidateId) as TrailRow
+      .prepare(`SELECT * FROM trial WHERE candidate_id = ?`)
+      .get(candidateId) as TrialRow
   }
 
-  public updateTrail(trail: TrailRow): { success: boolean; changes?: number; error?: string } {
+  public updateTrial(trial: TrialRow): { success: boolean; changes?: number; error?: string } {
     try {
       // 1. Validation: Ensure ID exists before attempting update
-      if (!trail.id) {
+      if (!trial.id) {
         return { success: false, error: 'Missing Trail ID' }
       }
 
       const stmt = this.db.prepare(`
-      UPDATE trail
-      SET turns_m = ?, result = ?, level = ?, class = ?
+      UPDATE trial
+      SET turns_m = ?, 
+      remaining_time = ?, 
+      result = ?, 
+      level = ?, 
+      class = ?
       WHERE id = ?`)
 
-      const info = stmt.run(trail.turns_m, trail.result, trail.level, trail.class, trail.id)
+      const info = stmt.run(
+        trial.turns_m,
+        trial.remaining_time,
+        trial.result,
+        trial.level,
+        trial.class,
+        trial.id
+      )
 
       // 2. Check if any row was actually updated
       if (info.changes === 0) {
-        return { success: false, error: 'No trail found with that ID' }
+        return { success: false, error: 'No trial found with that ID' }
       }
 
       return { success: true, changes: info.changes }
@@ -246,8 +258,8 @@ class AppDatabase {
   }
 
   // Method to fetch all trails (for your Shadcn tables later)
-  public getAllTrails(): TrailRow[] {
-    return this.db.prepare('SELECT * FROM trail ORDER BY created_at DESC').all() as TrailRow[]
+  public getAllTrials(): TrialRow[] {
+    return this.db.prepare('SELECT * FROM trial ORDER BY created_at DESC').all() as TrialRow[]
   }
 
   public getAllCandidates(): CandidateRow[] {
@@ -271,15 +283,21 @@ class AppDatabase {
 
       const stmt = this.db.prepare(`
       UPDATE app_settings 
-      SET language = ?, trail_time = ?, level_1 = ?, level_2 = ?, level_3 = ?
+      SET language = ?, 
+      trial_time = ?, 
+      level_1 = ?, 
+      level_2 = ?, 
+      level_3 = ?, 
+      module_number = ? 
       WHERE id = 1`)
 
       const info = stmt.run(
         languageToSave,
-        appSetting.trail_time,
+        appSetting.trial_time,
         appSetting.level_1,
         appSetting.level_2,
-        appSetting.level_3
+        appSetting.level_3,
+        appSetting.module_number
       )
 
       // 2. Check if ID 1 actually exists

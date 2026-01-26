@@ -1,12 +1,12 @@
-import { TrailJoinCandidate } from '@/types'
+import { TrialJoinCandidate } from '@/types'
 import { create } from 'zustand'
 
-interface TrailCandidateStore {
-  join: TrailJoinCandidate[]
-  setTrialJoinCnadidate: (join: TrailJoinCandidate[]) => void
+interface TrialCandidateStore {
+  join: TrialJoinCandidate[]
+  setTrialJoinCnadidate: (join: TrialJoinCandidate[]) => void
 }
 
-export const useTrailCandidateStore = create<TrailCandidateStore>((set) => ({
+export const useTrialCandidateStore = create<TrialCandidateStore>((set) => ({
   join: [],
   setTrialJoinCnadidate: (join) => set({ join })
 }))

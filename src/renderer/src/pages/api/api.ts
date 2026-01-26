@@ -3,11 +3,35 @@ import {
   CandidateRow,
   ErrorObject,
   Languages,
-  TrailJoinCandidate,
-  TrailRow
+  TrialJoinCandidate,
+  TrialRow
 } from '@/types'
 
 export default class apis {
+  public static async getCandidate(name: string, serial: number): Promise<CandidateRow> {
+    return await window.api.createOrGetCandidate(name, serial)
+  }
+
+  public static async getTrialByCandidateId(candidateId: number): Promise<TrialRow> {
+    return await window.api.getTrialByCandidateId(candidateId)
+  }
+
+  public static async updateTrial(trial: TrialRow): Promise<ErrorObject> {
+    return await window.api.updateTrial(trial)
+  }
+
+  public static async getAllTrialJoinCandidate(): Promise<TrialJoinCandidate[]> {
+    return await window.api.getTrialJoinCandidate()
+  }
+
+  public static async deleteCandidateAndTrial(candidateId: number): Promise<TrialJoinCandidate[]> {
+    return await window.api.deleteCandidateAndTrial(candidateId)
+  }
+
+  public static async deleteManually(candidateId: number): Promise<TrialJoinCandidate[]> {
+    return await window.api.deleteManually(candidateId)
+  }
+
   public static async getSettings(): Promise<AppSettings> {
     return await window.api.getSettings()
   }
@@ -18,28 +42,5 @@ export default class apis {
 
   public static async updateLangauge(language: Languages): Promise<ErrorObject> {
     return await window.api.updateLanguage(language)
-  }
-
-  public static async getCandidate(name: string, serial: number): Promise<CandidateRow> {
-    return await window.api.createOrGetCandidate(name, serial)
-  }
-  public static async getTrailByCandidateId(candidateId: number): Promise<TrailRow> {
-    return await window.api.getTrailByCandidateId(candidateId)
-  }
-
-  public static async updateTrail(trail: TrailRow): Promise<ErrorObject> {
-    return await window.api.updateTrail(trail)
-  }
-
-  public static async getAllTrailJoinCandidate(): Promise<TrailJoinCandidate[]> {
-    return await window.api.getTrailJoinCandidate()
-  }
-
-  public static async deleteCandidateAndTrail(candidateId: number): Promise<TrailJoinCandidate[]> {
-    return await window.api.deleteCandidateAndTrail(candidateId)
-  }
-
-  public static async deleteManually(candidateId: number): Promise<TrailJoinCandidate[]> {
-    return await window.api.deleteManually(candidateId)
   }
 }

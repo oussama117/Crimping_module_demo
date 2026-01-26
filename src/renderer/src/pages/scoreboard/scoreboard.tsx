@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Languages, Results, TrailJoinCandidate } from '@/types'
+import { Languages, Results, TrialJoinCandidate } from '@/types'
 import { ArrowBigDownDash, ArrowBigLeft, SearchIcon } from 'lucide-react'
 import { Label } from '@renderer/components/ui/label'
 import { Button } from '@renderer/components/ui/button'
@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { useAppSettingsStore } from '@renderer/store/useAppSettingStore'
 import apis from '../api/api'
-import { CandidateTrialsTable } from './components/candidateTialTable'
+import { CandidateTrialsTable } from './components/candidateTrialTable'
 import { Input } from '@renderer/components/ui/input'
 import * as XLSX from 'xlsx'
 import { Checkbox } from '@renderer/components/ui/checkbox'
@@ -19,7 +19,7 @@ export default function ScoreBoard(): React.JSX.Element {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { settings } = useAppSettingsStore()
-  const [data, setData] = useState<TrailJoinCandidate[]>([])
+  const [data, setData] = useState<TrialJoinCandidate[]>([])
   const [search, setSearch] = useState<string>('')
   const [includeInit, setIncludeInit] = useState<boolean>(false)
   // const tableRef = useRef(null)
@@ -40,11 +40,13 @@ export default function ScoreBoard(): React.JSX.Element {
         // Updated keys with score_board prefix
         [t('score_board.table_header.candidate_name')]: item.candidate?.candidate_name || 'N/A',
         [t('score_board.table_header.serial_number')]: item.candidate?.serial_number || 'N/A',
-        [t('score_board.table_header.level')]: item.level ? t(`trail_page.${item.level}`) : 'N/A',
+        [t('score_board.table_header.level')]: item.level ? t(`trial_page.${item.level}`) : 'N/A',
         [t('score_board.table_header.classification')]: item.class
-          ? t(`trail_page.class.${item.class}`)
+          ? t(`trial_page.class.${item.class}`)
           : 'N/A',
         [t('score_board.table_header.turns')]: item.turns_m === -1 ? 'N/A' : item.turns_m,
+        [t('score_board.table_header.remaining_time')]:
+          item.remaining_time === 0 ? 'N/A' : item.remaining_time,
         [t('score_board.table_header.result')]: item.result
           ? t(`score_board.table_header.${item.result}`)
           : 'N/A',
@@ -72,7 +74,7 @@ export default function ScoreBoard(): React.JSX.Element {
   }
 
   useEffect(() => {
-    apis.getAllTrailJoinCandidate().then((data) => {
+    apis.getAllTrialJoinCandidate().then((data) => {
       if (data.length === 0) {
         alert(`Failed to get candidates`)
         setData(data)
@@ -97,7 +99,7 @@ export default function ScoreBoard(): React.JSX.Element {
               }}
             >
               <ArrowBigLeft />
-              <Label className="cursor-pointer">{t('trail_page.return_button')}</Label>
+              <Label className="cursor-pointer">{t('trial_page.return_button')}</Label>
             </Button>
           </div>
           <div className="h-full flex-1 flex items-center justify-center gap-4">
@@ -106,19 +108,19 @@ export default function ScoreBoard(): React.JSX.Element {
               <label
                 className={`bg-black text-white font-bold px-[10px] py-[5px] ${settings.language === Languages.ar ? 'rounded-e-md' : 'rounded-s-md'}`}
               >
-                {t('trail_page.title')}
+                {t('trial_page.title')}
               </label>
               <label
                 className={`bg-red-600 text-white font-bold px-4 py-2 px-[10px] py-[5px] ${settings.language === Languages.ar ? 'rounded-s-md' : 'rounded-e-md'} `}
               >
-                6
+                {settings.module_number}
               </label>
             </div>
           </div>
           <div className="h-full flex-1 flex justify-end"></div>
         </div>
         <div className="flex-1 flex items-center justify-center">
-          <div className="w-[85%] relative h-full flex flex-col p-4">
+          <div className="w-[85%] relative h-full flex flex-col p-8">
             <div className="w-max h-[80px] p-4 flex items-center justify-center gap-2 mx-auto">
               <Input
                 type="search"
@@ -194,13 +196,13 @@ export default function ScoreBoard(): React.JSX.Element {
                 <label
                   className={`font-bold text-md ${settings.language === Languages.ar ? 'hidden' : ''}`}
                 >
-                  {t('trail_page.time')}
+                  {t('trial_page.time')}
                 </label>
-                <label className="font-bold text-md">{settings.trail_time}</label>
+                <label className="font-bold text-md">{settings.trial_time}</label>
                 <label
                   className={`font-bold text-md ${settings.language === Languages.ar ? '' : 'hidden'}`}
                 >
-                  {t('trail_page.time')}
+                  {t('trial_page.time')}
                 </label>
               </div>
               <Separator />
