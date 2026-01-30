@@ -1,4 +1,4 @@
-# taping_demo
+# Crimping_demo
 
 An Electron application with React and TypeScript
 
