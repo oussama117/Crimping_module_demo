@@ -11,17 +11,19 @@ export class ArduinoBridge {
   // Initialization method called in app.whenReady
   async init(mainWindow: Electron.BrowserWindow) {
     const ports = await SerialPort.list()
+    // console.log(ports)
     const arduino = ports.find((p) => p.manufacturer?.includes('Arduino'))
 
-    if (arduino) {
-      this.port = new SerialPort({ path: arduino.path, baudRate: 115200 })
-      this.parser = this.port.pipe(new ReadlineParser({ delimiter: '\n' }))
+    // if (arduino) {
+    // this.port = new SerialPort({ path: arduino.path, baudRate: 115200 })
+    this.port = new SerialPort({ path: 'COM10', baudRate: 115200 })
+    this.parser = this.port.pipe(new ReadlineParser({ delimiter: '\n' }))
 
-      this.parser.on('data', (data) => {
-        // Send every line from Arduino to the Frontend automatically
-        mainWindow.webContents.send('arduino:data', data)
-      })
-    }
+    this.parser.on('data', (data) => {
+      // Send every line from Arduino to the Frontend automatically
+      mainWindow.webContents.send('arduino:data', data)
+    })
+    // }
 
     // Set up IPC Handlers for the Frontend to call
     this.setupHandlers()

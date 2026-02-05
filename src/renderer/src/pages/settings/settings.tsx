@@ -7,7 +7,6 @@ import {
   Hash,
   Info,
   LanguagesIcon,
-  RefreshCcwDot,
   RotateCcw,
   Save
 } from 'lucide-react'
@@ -192,9 +191,9 @@ export default function Settings(): React.JSX.Element {
                   <SelectValue placeholder="Language" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="fr">Français 'fr'</SelectItem>
-                  <SelectItem value="en">English 'en'</SelectItem>
-                  <SelectItem value="ar">العربية 'ar'</SelectItem>
+                  <SelectItem value="fr">Français</SelectItem>
+                  <SelectItem value="en">English</SelectItem>
+                  <SelectItem value="ar">Arabic (العربية)</SelectItem>
                 </SelectContent>
               </Select>
               {settings.language === Languages.ar ? (
@@ -256,47 +255,6 @@ export default function Settings(): React.JSX.Element {
                 ''
               )}
             </div>
-            <div className="w-full flex items-center justify-between bg-white p-4 rounded-xl border border-gray-400 shadow-md">
-              {settings.language != Languages.ar ? (
-                <div className="flex gap-2 items-center">
-                  <Clock />
-                  <div className={`w-max flex flex-col`}>
-                    <label className="text-lg font-bold w-max">
-                      {t('settings_page.trial_time_setting')}
-                    </label>
-                    <p className={`text-xs text-gray-400 w-max`}>
-                      {t('settings_page.trial_time_setting_info')}
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                ''
-              )}
-              <Input
-                type="number"
-                className="w-[20%]"
-                placeholder={t('settings_page.trial_time_placeholder')}
-                onChange={(e) => {
-                  const val = e.target.value === '' ? null : Number(e.target.value)
-                  setAppSettings({ ...settings, trial_time: val })
-                }}
-              ></Input>
-              {settings.language === Languages.ar ? (
-                <div className="flex gap-2 items-center">
-                  <div className={`w-max flex flex-col items-end`}>
-                    <label className="text-lg font-bold w-max">
-                      {t('settings_page.trial_time_setting')}
-                    </label>
-                    <p className={`text-xs text-gray-400 w-max`}>
-                      {t('settings_page.trial_time_setting_info')}
-                    </p>
-                  </div>
-                  <Clock />
-                </div>
-              ) : (
-                ''
-              )}
-            </div>
             <label
               className={`w-full text-black text-2xl leading-none ${settings.language === Languages.ar ? 'text-right' : ''}`}
             >
@@ -310,7 +268,7 @@ export default function Settings(): React.JSX.Element {
             <div className="w-full flex items-center justify-between bg-white p-4 rounded-xl border border-gray-400 shadow-md">
               {settings.language != Languages.ar ? (
                 <div className="flex gap-2 items-center">
-                  <RefreshCcwDot />
+                  <Clock />
                   <div className={`w-max flex flex-col`}>
                     <label className="text-lg font-bold w-max">
                       {t('settings_page.level_1_setting')}
@@ -336,7 +294,7 @@ export default function Settings(): React.JSX.Element {
                       {t('settings_page.level_1_setting')}
                     </label>
                   </div>
-                  <RefreshCcwDot />
+                  <Clock />
                 </div>
               ) : (
                 ''
@@ -345,7 +303,7 @@ export default function Settings(): React.JSX.Element {
             <div className="w-full flex items-center justify-between bg-white p-4 rounded-xl border border-gray-400 shadow-md">
               {settings.language != Languages.ar ? (
                 <div className="flex gap-2 items-center">
-                  <RefreshCcwDot />
+                  <Clock />
                   <div className={`w-max flex flex-col`}>
                     <label className="text-lg font-bold w-max">
                       {t('settings_page.level_2_setting')}
@@ -371,7 +329,7 @@ export default function Settings(): React.JSX.Element {
                       {t('settings_page.level_2_setting')}
                     </label>
                   </div>
-                  <RefreshCcwDot />
+                  <Clock />
                 </div>
               ) : (
                 ''
@@ -380,7 +338,7 @@ export default function Settings(): React.JSX.Element {
             <div className="w-full flex items-center justify-between bg-white p-4 rounded-xl border border-gray-400 shadow-md">
               {settings.language != Languages.ar ? (
                 <div className="flex gap-2 items-center">
-                  <RefreshCcwDot />
+                  <Clock />
                   <div className={`w-max flex flex-col`}>
                     <label className="text-lg font-bold w-max">
                       {t('settings_page.level_3_setting')}
@@ -406,7 +364,7 @@ export default function Settings(): React.JSX.Element {
                       {t('settings_page.level_3_setting')}
                     </label>
                   </div>
-                  <RefreshCcwDot />
+                  <Clock />
                 </div>
               ) : (
                 ''
@@ -421,18 +379,18 @@ export default function Settings(): React.JSX.Element {
             <div className="flex items-center justify-between p-4 text-md text-gray-600">
               <label className={`font-bold ${settings.language === Languages.ar ? '' : 'hidden'}`}>
                 {settings.language === Languages.ar
-                  ? "'ar' العربية"
+                  ? 'Arabic (العربية)'
                   : settings.language === Languages.en
-                    ? "English 'en'"
-                    : "Français 'fr'"}
+                    ? 'English'
+                    : 'Français'}
               </label>
               <label className="text-md text-gray-600">{t('settings_page.language_setting')}</label>
               <label className={`font-bold ${settings.language === Languages.ar ? 'hidden' : ''}`}>
                 {settings.language === Languages.ar
-                  ? "'ar' العربية"
+                  ? 'Arabic (العربية)'
                   : settings.language === Languages.en
-                    ? "English 'en'"
-                    : "Français 'fr'"}
+                    ? 'English'
+                    : 'Français'}
               </label>
             </div>
             <Separator />
@@ -450,13 +408,11 @@ export default function Settings(): React.JSX.Element {
             <Separator />
             <div className="flex items-center justify-between p-4 text-md text-gray-600">
               <label className={`font-bold ${settings.language === Languages.ar ? '' : 'hidden'}`}>
-                {settings.trial_time}
+                {settings.terminals}
               </label>
-              <label className="text-md text-gray-600">
-                {t('settings_page.trial_time_setting')}
-              </label>
+              <label className="text-md text-gray-600">{t('settings_page.terminal')}</label>
               <label className={`font-bold ${settings.language === Languages.ar ? 'hidden' : ''}`}>
-                {settings.trial_time}
+                {settings.terminals}
               </label>
             </div>
             <Separator />
@@ -525,10 +481,10 @@ export default function Settings(): React.JSX.Element {
             onClick={() => {
               setAppSettings({
                 ...settings,
-                trial_time: 60,
-                level_1: 60,
-                level_2: 90,
-                level_3: 110,
+                terminals: 10,
+                level_1: 35,
+                level_2: 30,
+                level_3: 25,
                 module_number: 6
               })
             }}

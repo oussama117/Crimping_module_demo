@@ -48,7 +48,8 @@ export function CandidateTrialsTable({ onDelete, trials }: Props) {
             <TableHead>{t('score_board.table_header.serial_number')}</TableHead>
             <TableHead>{t('score_board.table_header.level')}</TableHead>
             <TableHead>{t('score_board.table_header.classification')}</TableHead>
-            <TableHead>{t('score_board.table_header.turns')}</TableHead>
+            <TableHead>{t('score_board.table_header.crimped_t')}</TableHead>
+            <TableHead>{t('score_board.table_header.failed_t')}</TableHead>
             <TableHead>{t('score_board.table_header.remaining_time')}</TableHead>
             <TableHead>{t('score_board.table_header.result')}</TableHead>
             <TableHead>{t('score_board.table_header.date')}</TableHead>
@@ -68,7 +69,8 @@ export function CandidateTrialsTable({ onDelete, trials }: Props) {
                 {/* Trial Details - Using trial_page translation paths */}
                 <TableCell>{trial.level ? t(`trial_page.${trial.level}`) : 'N/A'}</TableCell>
                 <TableCell>{trial.class ? t(`trial_page.class.${trial.class}`) : 'N/A'}</TableCell>
-                <TableCell>{trial.turns_m === -1 ? 'N/A' : trial.turns_m}</TableCell>
+                <TableCell>{trial.crimped_t === 0 ? 'N/A' : trial.crimped_t}</TableCell>
+                <TableCell>{trial.failed_t === 0 ? 'N/A' : trial.failed_t}</TableCell>
 
                 {/* Result as Plain Text - Using score_board path */}
                 <TableCell>{trial.remaining_time ? trial.remaining_time : 'N/A'}</TableCell>

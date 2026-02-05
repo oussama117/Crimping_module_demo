@@ -11,7 +11,8 @@ export const useTrialStore = create<TrialStore>((set) => ({
   trial: {
     id: null,
     candidate_id: null,
-    turns_m: null,
+    crimped_t: null,
+    failed_t: null,
     remaining_time: null,
     result: null,
     level: null,
@@ -23,7 +24,8 @@ export const useTrialStore = create<TrialStore>((set) => ({
       trial: {
         id: null,
         candidate_id: null,
-        turns_m: null,
+        crimped_t: null,
+        failed_t: null,
         remaining_time: null,
         result: null,
         level: null,

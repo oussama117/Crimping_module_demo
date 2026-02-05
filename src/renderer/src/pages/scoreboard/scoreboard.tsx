@@ -44,11 +44,12 @@ export default function ScoreBoard(): React.JSX.Element {
         [t('score_board.table_header.classification')]: item.class
           ? t(`trial_page.class.${item.class}`)
           : 'N/A',
-        [t('score_board.table_header.turns')]: item.turns_m === -1 ? 'N/A' : item.turns_m,
+        [t('score_board.table_header.crimped_t')]: item.crimped_t === -1 ? 'N/A' : item.crimped_t,
+        [t('score_board.table_header.failed_t')]: item.failed_t === -1 ? 'N/A' : item.failed_t,
         [t('score_board.table_header.remaining_time')]:
           item.remaining_time === 0 ? 'N/A' : item.remaining_time,
         [t('score_board.table_header.result')]: item.result
-          ? t(`score_board.table_header.${item.result}`)
+          ? t(`score_board.results.${item.result}`)
           : 'N/A',
         [t('score_board.table_header.date')]: item.created_at
           ? new Date(item.created_at).toLocaleDateString()
@@ -62,7 +63,7 @@ export default function ScoreBoard(): React.JSX.Element {
 
     // 3. Define Filename
     const dateStr = new Date().toISOString().split('T')[0]
-    const fileName = `Yazaki_Didactic_6_Trials_${dateStr}.xlsx`
+    const fileName = `Yazaki_Didactic_${settings.module_number}_Trials_${dateStr}_${includeInit ? 'Winit' : ''}.xlsx`
 
     // 4. Trigger Download
     XLSX.writeFile(workbook, fileName)
@@ -196,13 +197,13 @@ export default function ScoreBoard(): React.JSX.Element {
                 <label
                   className={`font-bold text-md ${settings.language === Languages.ar ? 'hidden' : ''}`}
                 >
-                  {t('trial_page.time')}
+                  {t('settings_page.terminal')}
                 </label>
-                <label className="font-bold text-md">{settings.trial_time}</label>
+                <label className="font-bold text-md">{settings.terminals}</label>
                 <label
                   className={`font-bold text-md ${settings.language === Languages.ar ? '' : 'hidden'}`}
                 >
-                  {t('trial_page.time')}
+                  {t('settings_page.terminal')}
                 </label>
               </div>
               <Separator />

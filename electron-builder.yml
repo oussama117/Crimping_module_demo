@@ -12,8 +12,8 @@ files:
 asarUnpack:
   - resources/**
 win:
-  icon: build/taping_icon.ico
-  executableName: Taping_module
+  icon: build/Crimping_icon.ico
+  executableName: Crimping_module
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}

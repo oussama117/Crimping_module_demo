@@ -10,7 +10,8 @@ import {
   ReturnCandidateDTO,
   AppSettings,
   Languages,
-  ErrorObject
+  ErrorObject,
+  Levels
 } from '@/types'
 
 class AppDatabase {
@@ -19,7 +20,7 @@ class AppDatabase {
   constructor() {
     // Persistent storage path
     const userDataPath = app.getPath('userData')
-    const dbPath = path.join(userDataPath, 'taping_db.sqlite')
+    const dbPath = path.join(userDataPath, 'crimping_db.sqlite')
 
     if (!fs.existsSync(userDataPath)) {
       fs.mkdirSync(userDataPath, { recursive: true })
@@ -50,7 +51,7 @@ class AppDatabase {
       SELECT 
         t.id as t_id, 
         t.candidate_id as t_candidate_id, 
-        t.turns_m, t.remaining_time, t.result, t.level, t.class, 
+        t.crimped_t, t.failed_t, t.remaining_time, t.result, t.level, t.class, 
         t.created_at as t_created, t.updated_at as t_updated,
         c.id as c_id, c.candidate_name, c.serial_number, 
         c.created_at as c_created, c.updated_at as c_updated
@@ -68,7 +69,8 @@ class AppDatabase {
       return rows.map((row) => ({
         id: row.t_id,
         candidateId: row.t_candidate_id, // Fix: Use candidate_id, not t_id
-        turns_m: row.turns_m,
+        crimped_t: row.crimped_t,
+        failed_t: row.failed_t,
         remaining_time: row.remaining_time,
         result: row.result,
         level: row.level,
@@ -159,11 +161,11 @@ class AppDatabase {
       }
 
       const trialStmt = this.db.prepare(`
-      INSERT INTO trial ( candidate_id, turns_m, remaining_time, result, level, class )
-      VALUES (?, ?, ?, ?, ?, ?)
+      INSERT INTO trial ( candidate_id, crimped_t, failed_t, remaining_time, result, level, class )
+      VALUES (?, ?, ?, ?, ?, ?, ?)
       RETURNING *
     `)
-      const newTrial = trialStmt.get(newCandidate.id, -1, 0, 'init', 'level_init', 'class_init')
+      const newTrial = trialStmt.get(newCandidate.id, 0, 0, 0, 'init', 'level_init', 'class_init')
       if (!newTrial) {
         throw new Error('Failed to create trial: No data returned')
       }
@@ -225,7 +227,8 @@ class AppDatabase {
 
       const stmt = this.db.prepare(`
       UPDATE trial
-      SET turns_m = ?, 
+      SET crimped_t = ?,
+      failed_t = ?, 
       remaining_time = ?, 
       result = ?, 
       level = ?, 
@@ -233,7 +236,8 @@ class AppDatabase {
       WHERE id = ?`)
 
       const info = stmt.run(
-        trial.turns_m,
+        trial.crimped_t,
+        trial.failed_t,
         trial.remaining_time,
         trial.result,
         trial.level,
@@ -284,7 +288,7 @@ class AppDatabase {
       const stmt = this.db.prepare(`
       UPDATE app_settings 
       SET language = ?, 
-      trial_time = ?, 
+      terminals = ?, 
       level_1 = ?, 
       level_2 = ?, 
       level_3 = ?, 
@@ -293,7 +297,7 @@ class AppDatabase {
 
       const info = stmt.run(
         languageToSave,
-        appSetting.trial_time,
+        appSetting.terminals,
         appSetting.level_1,
         appSetting.level_2,
         appSetting.level_3,

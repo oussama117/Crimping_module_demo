@@ -1,4 +1,5 @@
 {
+  "dir": "ltr",
   "system": {
     "close_app": "Êtes-vous sûr de vouloir fermer l'application ? Toutes les données non sauvegardées seront perdues."
   },
@@ -10,7 +11,9 @@
     "settings_button": "PARAMÈTRES",
     "number_error": "Le matricule doit contenir 5 chiffres",
     "name_error": "Le nom ne peut pas être vide",
-    "score_button": "TABLEAU DE SCORE"
+    "score_button": "TABLEAU DE SCORE",
+    "level_info": "Choisir un niveau",
+    "level_err": " - Veuillez choisir un niveau pour continuer"
   },
   "trial_page": {
     "title": "DIDACTIQUE",
@@ -37,6 +40,13 @@
       "intermediate": "Intermédiaire",
       "advanced": "Avancé"
     },
+    "course_class": {
+      "class_init": "Initialisation",
+      "init": "Cours Initial",
+      "beginner": "Cours Débutant",
+      "intermediate": "Cours Intermédiaire",
+      "advanced": "Cours Avancé"
+    },
     "result": {
       "init": "En attente...",
       "success": "Vous avez réussi !",
@@ -51,7 +61,10 @@
     "success_p": "Voici vos résultats. Félicitations pour vos efforts ! Vous pouvez quitter si vous avez terminé.",
     "failed_p": "Voici vos résultats. L'objectif n'est pas atteint. Cliquez sur 'Réessayer' ou sur 'Quitter' pour finir.",
     "try_again_button": "Réessayer",
-    "exit_button": "Quitter"
+    "exit_button": "Quitter",
+    "reset": "Réinitialiser !",
+    "reset_instruction": "Veuillez appuyer sur le bouton RESET",
+    "reset_long_desc": "Pour continuer l'essai, appuyez sur le bouton RESET pour arrêter le buzzer et le voyant rouge clignotant. Cette fenêtre s'affiche en cas de défaut de continuité ; elle se fermera automatiquement après avoir appuyé sur reset."
   },
   "settings_page": {
     "title": "Paramètres",
@@ -66,7 +79,7 @@
     "trial_time_placeholder": "Régler le temps ici",
     "trial_time_setting_info": "Saisissez le temps d'essai en secondes dans le champ ci-dessus.",
     "levels_title": "Niveaux: ",
-    "levels_setting_info": "Saisissez le nombre de tours par niveau dans les champs ci-dessous.",
+    "levels_setting_info": "Saisissez le nombre de secondes par niveau dans les champs de saisie.",
     "level_1_setting": "Niveau 1",
     "level_1_placeholder": "Régler le niveau 1",
     "level_2_setting": "Niveau 2",
@@ -79,7 +92,8 @@
     "cancel_button": "Abandonner",
     "confirm_message": "Voulez-vous enregistrer les modifications des paramètres ?",
     "search": "Rechercher un candidat",
-    "trial_ref": "Références de l'essai"
+    "trial_ref": "Références de l'essai",
+    "terminal": "Bornes de fils"
   },
   "score_board": {
     "table_header": {
@@ -91,7 +105,9 @@
       "remaining_time": "Temps restant",
       "result": "Résultat",
       "date": "Date",
-      "actions": "Actions"
+      "actions": "Actions",
+      "crimped_t": "Borne sertie",
+      "failed_t": "Borne desserrée"
     },
     "results": {
       "init": "Initial",

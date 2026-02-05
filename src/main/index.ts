@@ -12,10 +12,10 @@ const arduino = new ArduinoBridge()
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    fullscreen: true,
-    title: 'Taping module',
-    // width: 1200,
-    // height: 670,
+    // fullscreen: true,
+    title: 'Crimping module',
+    width: 1200,
+    height: 670,
     show: false,
     autoHideMenuBar: true,
     // alwaysOnTop: true,

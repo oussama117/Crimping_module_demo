@@ -1,4 +1,4 @@
-import { ErrorObject, TrialRow } from '@/types'
+import { ErrorObject, Levels, TrialRow } from '@/types'
 import { ElectronAPI } from '@electron-toolkit/preload'
 
 export interface ICustomAPI {

@@ -1,4 +1,5 @@
 {
+  "dir": "ltr",
   "system": {
     "close_app": "Are you sure you want to close the App? All unsaved data will be lost."
   },
@@ -10,7 +11,9 @@
     "settings_button": "SETTINGS",
     "number_error": "5 digits number required",
     "name_error": "name can not be empty",
-    "score_button": "SCORE BOARD"
+    "score_button": "SCORE BOARD",
+    "level_info": "Select a level",
+    "level_err": " - Please select a level to continue"
   },
   "trial_page": {
     "title": "DIDACTIC",
@@ -37,6 +40,13 @@
       "intermediate": "Intermediate",
       "advanced": "Advanced"
     },
+    "course_class": {
+      "class_init": "Initialization",
+      "init": "Initial Course",
+      "beginner": "Beginner Course",
+      "intermediate": "Intermediate Course",
+      "advanced": "Advanced Course"
+    },
     "result": {
       "init": "Waiting to start...",
       "success": "You have succeeded!",
@@ -51,7 +61,10 @@
     "success_p": "This dialog shows your performance. Congratulations on your hard work! You can exit if you are finished.",
     "failed_p": "This dialog shows your performance. It seems the goal wasn't met this time. Try again by pressing 'Try Again', or press 'Exit' to finish.",
     "try_again_button": "Try Again",
-    "exit_button": "Exit"
+    "exit_button": "Exit",
+    "reset": "Reset!",
+    "reset_instruction": "Please press the RESET button",
+    "reset_long_desc": "To continue the trial, press the RESET button to stop the buzzer and the flashing red LED. This dialog appears whenever continuity is missing; it will close automatically once the reset button is pressed."
   },
   "settings_page": {
     "title": "Settings",
@@ -66,7 +79,7 @@
     "trial_time_placeholder": "Set trial time here",
     "trial_time_setting_info": "Type the trial time in seconds in the input field above.",
     "levels_title": "Levels: ",
-    "levels_setting_info": "Type the number of turns per level in the level inputs below.",
+    "levels_setting_info": "Type the number of seconds per level in the level inputs.",
     "level_1_setting": "Level 1",
     "level_1_placeholder": "Set level 1 here",
     "level_2_setting": "Level 2",
@@ -79,7 +92,8 @@
     "cancel_button": "Abort",
     "confirm_message": "Do you want to save changes to the settings?",
     "search": "Search for candidate",
-    "trial_ref": "Trial References"
+    "trial_ref": "Trial References",
+    "terminal": "Wire terminals"
   },
   "score_board": {
     "table_header": {
@@ -91,7 +105,9 @@
       "remaining_time": "Remaining time",
       "result": "Result",
       "date": "Date",
-      "actions": "Actions"
+      "actions": "Actions",
+      "crimped_t": "Crimped terminal",
+      "failed_t": "Loose terminal"
     },
     "results": {
       "init": "Initial",

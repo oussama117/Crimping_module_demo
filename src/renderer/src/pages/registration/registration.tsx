@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Button } from '../../components/ui/button'
-import { Asterisk, ChartColumnIcon, Cog, Play, User } from 'lucide-react'
+import { Asterisk, ChartColumnIcon, ChevronDown, Cog, Play, User } from 'lucide-react'
 import { Label } from '../../components/ui/label'
 import { useTranslation } from 'react-i18next'
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue
@@ -15,11 +16,13 @@ import yazaki_logo from '../../assets/logo.png'
 import bg from '../../assets/yazaki_bg_gray.jpg'
 import { useNavigate } from 'react-router-dom'
 import { useAppSettingsStore } from '@renderer/store/useAppSettingStore'
-import { Languages } from '@/types'
+import { Languages, Levels } from '@/types'
 import apis from '../api/api'
 import { useCandidateStore } from '@renderer/store/useCandidateStore'
 import { useTrialStore } from '@/renderer/src/store/useTrialStore'
 import { toast } from 'sonner'
+import { SelectLabel } from '@radix-ui/react-select'
+import { useLevelStore } from '@renderer/store/setLeveStore'
 
 export default function RegistrationPage(): React.JSX.Element {
   const { t } = useTranslation()
@@ -27,10 +30,12 @@ export default function RegistrationPage(): React.JSX.Element {
   const [reg_number, setRegNumber] = useState('')
   const [validReg, setValid] = useState('empty')
   const [validName, setValidName] = useState('empty')
+  const [validLevel, setValidLevel] = useState('empty')
   const navigate = useNavigate()
   const { settings, setAppSettings, loadAppSettings } = useAppSettingsStore()
   const { setCandidate } = useCandidateStore()
   const { setTrial } = useTrialStore()
+  const { setLevel } = useLevelStore()
 
   useEffect(() => {
     loadAppSettings()
@@ -67,6 +72,14 @@ export default function RegistrationPage(): React.JSX.Element {
       setName(value)
     }
   }
+  const handleLevelChange = (level: Levels) => {
+    if (level === Levels.level_init) {
+      setValidLevel('invalid')
+    } else {
+      setValidLevel('valid')
+      setLevel(level)
+    }
+  }
   return (
     <>
       <div className="relative flex flex-col min-h-screen min-w-screen text-black  items-center justify-center">
@@ -82,7 +95,6 @@ export default function RegistrationPage(): React.JSX.Element {
               </label>
             </div>
           </div>
-          {/* content */}
           <div className="w-[60%] border border-gray-400 flex flex-col flex-1 items-center justify-center gap-6">
             <div className="flex flex-col w-full p-6">
               <div
@@ -137,12 +149,120 @@ export default function RegistrationPage(): React.JSX.Element {
                   />
                 </div>
               </div>
+              <label
+                className={`py-2 px-4 text-gray-600 text-sm font-bold ${settings.language === Languages.ar ? 'text-right' : ''}`}
+              >
+                {t('registration_page.level_info')}
+                <span
+                  className={`text-red-600  ${validLevel === 'valid' || validLevel === 'empty' ? 'hidden' : ''}`}
+                >
+                  {t('registration_page.level_err')}
+                </span>
+              </label>
+              <div
+                className={`z-[200] box-border h-max w-full flex border border-[#E5E5E5] focus-within:border-gray-400 ${validLevel === 'valid' || validLevel === 'empty' ? 'bg-[#E5E5E5]' : 'bg-red-200'}`}
+              >
+                <Select
+                  dir={settings.language === Languages.ar ? 'rtl' : 'ltr'}
+                  onValueChange={(value) => {
+                    handleLevelChange(
+                      value === Levels.level_3
+                        ? Levels.level_3
+                        : value === Levels.level_2
+                          ? Levels.level_2
+                          : value === Levels.level_1
+                            ? Levels.level_1
+                            : Levels.level_init
+                    )
+                    // console.log('reg select value: ', value)
+                  }}
+                >
+                  <SelectTrigger
+                    className={`cursor-pointer w-full h-[70px] min-h-[70px] min-w-full text-gray-800 text-xl font-bold shadow-none rounded-none [&>svg]:size-8 [&>svg]:stroke-4`}
+                  >
+                    <SelectValue
+                      placeholder={t('settings_page.levels_title').replaceAll(':', '')}
+                    />
+                  </SelectTrigger>
+                  <SelectContent
+                    // position="popper"
+                    className="z-[201] bg-[#E5E5E5] rounded-none"
+                  >
+                    <SelectGroup>
+                      <SelectLabel className="text-gray-600">
+                        {t('settings_page.levels_title')}
+                      </SelectLabel>
+                      <SelectItem
+                        key={Levels.level_1}
+                        value={Levels.level_1}
+                        className={`h-[70px] w-full flex justify-between text-xl font-bold rounded-none ${settings.language === Languages.ar ? 'text-right' : ''}`}
+                      >
+                        <label className="text-gray-800">
+                          {t('settings_page.level_1_setting')}
+                        </label>
+                        ,
+                        <label className="text-gray-400">
+                          {t('trial_page.course_class.beginner')}
+                        </label>
+                        ,
+                        <div className="">
+                          <label className="text-gray-400">
+                            {settings.level_1}
+                            <span>{t('trial_page.second')}</span>
+                          </label>
+                        </div>
+                      </SelectItem>
+                      <SelectItem
+                        key={Levels.level_2}
+                        value={Levels.level_2}
+                        className={`h-[70px] w-full flex justify-between text-xl font-bold rounded-none ${settings.language === Languages.ar ? 'text-right' : ''}`}
+                      >
+                        <label className="text-gray-800">
+                          {t('settings_page.level_2_setting')}
+                        </label>
+                        ,
+                        <label className="text-gray-400">
+                          {t('trial_page.course_class.intermediate')}
+                        </label>
+                        ,
+                        <div className="">
+                          <label className="text-gray-400">
+                            {settings.level_2}
+                            <span>{t('trial_page.second')}</span>
+                          </label>
+                        </div>
+                      </SelectItem>
+                      <SelectItem
+                        key={Levels.level_3}
+                        value={Levels.level_3}
+                        className={`h-[70px] w-full flex justify-between text-xl font-bold rounded-none ${settings.language === Languages.ar ? 'text-right' : ''}`}
+                      >
+                        <label className="text-gray-800">
+                          {t('settings_page.level_3_setting')}
+                        </label>
+                        ,
+                        <label className="text-gray-400">
+                          {t('trial_page.course_class.advanced')}
+                        </label>
+                        ,
+                        <div className="">
+                          <label className="text-gray-400">
+                            {settings.level_3}
+                            <span>{t('trial_page.second')}</span>
+                          </label>
+                        </div>
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
               <Button
                 className="h-[70px] bg-[#DA5949] hover:bg-[#D88D87] cursor-pointer w-full rounded-none text-xl"
                 // disabled={validReg !== 'valid' || validName !== 'valid'}
                 onClick={() => {
-                  if (validReg === 'empty' || validName === 'empty') {
+                  if (validReg === 'empty' || validName === 'empty' || validLevel === 'empty') {
                     setValidName('invalid')
+                    setValidLevel('invalid')
                     setValid('invalid')
                     return
                   }
@@ -218,13 +338,13 @@ export default function RegistrationPage(): React.JSX.Element {
             }}
             value={settings.language || Languages.fr}
           >
-            <SelectTrigger className="w-[120px] bg-black text-white shadow-lg">
+            <SelectTrigger className="cursor-pointer w-[150px] bg-black text-white shadow-lg [&>svg]:stroke-white">
               <SelectValue placeholder="Language" />
             </SelectTrigger>
             <SelectContent className="bg-white">
-              <SelectItem value="fr">Français 'fr'</SelectItem>
-              <SelectItem value="en">English 'en'</SelectItem>
-              <SelectItem value="ar">العربية 'ar'</SelectItem>
+              <SelectItem value="fr">Français</SelectItem>
+              <SelectItem value="en">English</SelectItem>
+              <SelectItem value="ar">Arabic (العربية)</SelectItem>
             </SelectContent>
           </Select>
         </div>
