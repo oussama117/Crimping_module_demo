@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Button } from '../../components/ui/button'
-import { Asterisk, ChartColumnIcon, ChevronDown, Cog, Play, User } from 'lucide-react'
+import { Asterisk, ChartColumnIcon, Cog, Play, User } from 'lucide-react'
 import { Label } from '../../components/ui/label'
 import { useTranslation } from 'react-i18next'
 import {

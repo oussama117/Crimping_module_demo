@@ -14,7 +14,7 @@ import {
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import yazakiLogo from '../../assets/logo.png'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useCandidateStore } from '@renderer/store/useCandidateStore'
 import { Classifications, Languages, Levels, Results, TrialRow } from '@/types'
 import { useTrialStore } from '@/renderer/src/store/useTrialStore'
